@@ -1,0 +1,35 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+*.manifest
+*.spec
+
+# --- Virtual Environment ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- IDE / Editor ---
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# --- OS ---
+Thumbs.db
+Desktop.ini
+
+# --- Project specific ---
+resources/
+# Add project-specific ignores below
