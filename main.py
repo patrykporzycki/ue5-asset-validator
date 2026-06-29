@@ -1,10 +1,12 @@
 import unreal
+import pathlib
 
-from core.texture_checker import check_power_of_two, check_max_resolution, check_mipmaps, check_srgb, check_compression
+from core.texture_checker import check_power_of_two, check_max_resolution, check_mipmaps, check_srgb, check_compression, set_suffix_rules
 from editor.adapter import get_texture_properties
-from editor.fixer import fix_mipmaps, fix_srgb
+from editor.fixer import fix_mipmaps
+from core.rule_loader import load_rules
 
-def run():
+def run(config_path = None):
 
     selection = unreal.EditorUtilityLibrary.get_selected_assets()
     textures = [a for a in selection if isinstance(a, unreal.Texture2D)]
@@ -13,6 +15,11 @@ def run():
         unreal.log("No textures selected!")
         return
 
+    if config_path is None:
+        config_path = pathlib.Path(__file__).parent / "config" / "validation_rules.json"
+    rules = load_rules(config_path)
+    set_suffix_rules(rules["suffix_rules"])
+
     unreal.log(f"Checking {len(textures)} textures...")
     for texture in textures:
         properties = get_texture_properties(texture)
@@ -20,7 +27,7 @@ def run():
 
         texture_checks = [
             (check_power_of_two, [properties['resolution_x'], properties['resolution_y']]),
-            (check_max_resolution, [properties['resolution_x'], properties['resolution_y'], 2048]),
+            (check_max_resolution, [properties['resolution_x'], properties['resolution_y'], rules["max_resolution"]]),
             (check_mipmaps, [properties['mip_gen']]),
             (check_srgb, [properties['srgb'], properties['name']]),
             (check_compression, [properties['compression'], properties['name']]),
@@ -36,7 +43,7 @@ def run():
                     fix_mipmaps(texture)
 
         if not texture_has_problems:
-            unreal.log(f"{texture_name}: Ok")
+            unreal.log(f"{texture_name}: OK")
 
 
         

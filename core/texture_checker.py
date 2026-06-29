@@ -1,46 +1,7 @@
-_SUFFIX_RULES = {
-    "_n": {"srgb": False, "compression": "TC_NORMALMAP"},
-    "_normal": {"srgb": False, "compression": "TC_NORMALMAP"},
-    "_nrm": {"srgb": False, "compression": "TC_NORMALMAP"},
+_SUFFIX_RULES = {}
 
-    "_r": {"srgb": False, "compression": "TC_GRAYSCALE"},
-    "_roughness": {"srgb": False, "compression": "TC_GRAYSCALE"},
-
-    "_m": {"srgb": False, "compression": "TC_GRAYSCALE"},
-    "_metallic": {"srgb": False, "compression": "TC_GRAYSCALE"},
-
-    "_ao": {"srgb": False, "compression": "TC_GRAYSCALE"},
-    "_ambientocclusion": {"srgb": False, "compression": "TC_GRAYSCALE"},
-    "_ambient_occlusion": {"srgb": False, "compression": "TC_GRAYSCALE"},
-
-    "_orm": {"srgb": False, "compression": "TC_MASKS"},
-    "_arm": {"srgb": False, "compression": "TC_MASKS"},
-
-    "_masks": {"srgb": False, "compression": "TC_MASKS"},
-    "_mask": {"srgb": False, "compression": "TC_MASKS"},
-
-    "_d": {"srgb": True, "compression": "TC_BASECOLOR"},
-    "_diffuse": {"srgb": True, "compression": "TC_BASECOLOR"},
-    "_albedo": {"srgb": True, "compression": "TC_BASECOLOR"},
-    "_basecolor": {"srgb": True, "compression": "TC_BASECOLOR"},
-    "_base_color": {"srgb": True, "compression": "TC_BASECOLOR"},
-    "_col": {"srgb": True, "compression": "TC_BASECOLOR"},
-    "_color": {"srgb": True, "compression": "TC_BASECOLOR"},
-
-    "_spec": {"srgb": False, "compression": "TC_GRAYSCALE"},
-    "_specular": {"srgb": False, "compression": "TC_GRAYSCALE"},
-
-    "_opacity": {"srgb": False, "compression": "TC_GRAYSCALE"},
-    "_alpha": {"srgb": False, "compression": "TC_GRAYSCALE"},
-
-    "_e": {"srgb": True, "compression": "TC_BASECOLOR"},
-    "_emissive": {"srgb": True, "compression": "TC_BASECOLOR"},
-
-    "_h": {"srgb": False, "compression": "TC_DISPLACEMENT"},
-    "_height": {"srgb": False, "compression": "TC_DISPLACEMENT"},
-    "_disp": {"srgb": False, "compression": "TC_DISPLACEMENT"},
-    "_displacement": {"srgb": False, "compression": "TC_DISPLACEMENT"},
-}
+def set_suffix_rules(rules: dict):
+    _SUFFIX_RULES.update(rules)
 
 def _is_power_of_two(n: int) -> bool:
     # TODO: check if texture dimensions from UE5 are always positive integers
