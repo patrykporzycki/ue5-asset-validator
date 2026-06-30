@@ -40,13 +40,13 @@ def fix_power_of_two(texture: unreal.Texture2D):
     unreal.log(f"Fixed power of two mode on {texture.get_fname()}: {previous_power_of_two} -> {current_power_of_two}")
     return True
 
-def fix_max_resolution(texture: unreal.Texture2D, max_texture_size: int):
+def fix_max_resolution(texture: unreal.Texture2D, max_texture_size: int, current_resolution_x: int, current_resolution_y: int):
     previous_max_resolution = texture.get_editor_property("max_texture_size")
+    current_resolution = f"{current_resolution_x}x{current_resolution_y}"
 
     with unreal.ScopedEditorTransaction("Fix Max Resolution"):
         texture.set_editor_property("max_texture_size", max_texture_size)
     current_max_resolution = texture.get_editor_property("max_texture_size")
 
-    current_dimensions = f"{texture.blueprint_get_size_x()}x{texture.blueprint_get_size_y()}"
-    unreal.log(f"Fixed max resolution on {texture.get_fname()}, dimensions {current_dimensions}: {previous_max_resolution} -> {current_max_resolution}")
+    unreal.log(f"Fixed max resolution on {texture.get_fname()}, dimensions {current_resolution}: {previous_max_resolution} -> {current_max_resolution}")
     return True
