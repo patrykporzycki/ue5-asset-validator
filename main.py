@@ -3,7 +3,7 @@ import pathlib
 
 from core.texture_checker import check_power_of_two, check_max_resolution, check_mipmaps, check_srgb, check_compression, set_suffix_rules
 from editor.adapter import get_texture_properties
-from editor.fixer import fix_mipmaps
+from editor.fixer import fix_mipmaps, fix_power_of_two, fix_max_resolution
 from core.rule_loader import load_rules
 
 def run(config_path = None):
@@ -41,7 +41,10 @@ def run(config_path = None):
                 unreal.log(f"{texture_name}: {result}")
                 if texture_check is check_mipmaps:
                     fix_mipmaps(texture)
-
+                elif texture_check is check_power_of_two:
+                    fix_power_of_two(texture)
+                elif texture_check is check_max_resolution:
+                    fix_max_resolution(texture, rules["max_resolution"])
         if not texture_has_problems:
             unreal.log(f"{texture_name}: OK")
 
