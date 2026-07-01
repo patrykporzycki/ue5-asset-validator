@@ -2,7 +2,6 @@ from core.alert import Alert
 
 _SUFFIX_RULES = {}
 
-
 def set_suffix_rules(rules: dict):
     _SUFFIX_RULES.update(rules)
 
@@ -11,33 +10,33 @@ def _is_power_of_two(n: int) -> bool:
     # TODO: check if texture dimensions from UE5 are always positive integers
     return (n & (n - 1)) == 0
 
-
-def check_power_of_two(resolution_x: int, resolution_y: int) -> Alert | None:
-    if _is_power_of_two(resolution_x) and _is_power_of_two(resolution_y):
+def check_power_of_two(props: dict, rules: dict) -> Alert | None:
+    if _is_power_of_two(props['resolution_x']) and _is_power_of_two(props['resolution_y']):
         return None
     return Alert(
             id="power_of_two",
             severity="warning",
-            message=f"Resolution {resolution_x}x{resolution_y} is not a power of two!",
-            current_value=f"{resolution_x}x{resolution_y}",
+            message=f"Resolution {props['resolution_x']}x{props['resolution_y']} is not a power of two!",
+            current_value=f"{props['resolution_x']}x{props['resolution_y']}",
             correct_value=None
         )
 
-def check_max_resolution(resolution_x: int, resolution_y: int, max_resolution: int) -> Alert | None:
-    current_resolution = max(resolution_x, resolution_y)
-    if current_resolution > max_resolution:
+
+def check_max_resolution(props: dict, rules: dict) -> Alert | None:
+    current_resolution = max(props['resolution_x'], props['resolution_y'])
+    if current_resolution > rules['max_resolution']:
         return Alert(
             id="max_resolution",
             severity="warning",
-            message=f"Resolution {resolution_x}x{resolution_y} exceeds {max_resolution}!",
+            message=f"Resolution {props['resolution_x']}x{props['resolution_y']} exceeds {rules['max_resolution']}!",
             current_value=str(current_resolution),
-            correct_value=str(max_resolution)
+            correct_value=str(rules['max_resolution'])
         )
     return None
 
 
-def check_mipmaps(mipgen_settings: str) -> Alert | None:
-    if mipgen_settings == "TMGS_NO_MIPMAPS":
+def check_mipmaps(props: dict, rules: dict) -> Alert | None:
+    if props['mipmaps'] == "TMGS_NO_MIPMAPS":
         return Alert(
             id="mipmaps",
             severity="critical",
@@ -55,31 +54,39 @@ def _find_rule(texture_name: str) -> dict | None:
     return None
 
 
-def check_srgb(srgb_settings: bool, texture_name: str) -> Alert | None:
-    rule = _find_rule(texture_name)
+def check_srgb(props: dict, rules: dict) -> Alert | None:
+    rule = _find_rule(props['name'])
     if rule is None:
         return None
-    if srgb_settings != rule['srgb']:
+    if props['srgb'] != rule['srgb']:
         return Alert(
             id="srgb",
             severity="warning",
-            message=f"sRGB setting is set to {srgb_settings}, but texture name suggests {rule['srgb']}",
-            current_value=srgb_settings,
+            message=f"sRGB setting is set to {props['srgb']}, but texture name suggests {rule['srgb']}",
+            current_value=props['srgb'],
             correct_value=rule['srgb'],
         )
     return None
 
 
-def check_compression(compression_settings: str, texture_name: str) -> Alert | None:
-    rule = _find_rule(texture_name)
+def check_compression(props: dict, rules: dict) -> Alert | None:
+    rule = _find_rule(props['name'])
     if rule is None:
         return None
-    if compression_settings != rule['compression']:
+    if props['compression'] != rule['compression']:
         return Alert(
             id="compression",
             severity="warning",
-            message=f"Compression setting is set to {compression_settings}, but texture name suggests {rule['compression']}",
-            current_value=compression_settings,
+            message=f"Compression setting is set to {props['compression']}, but texture name suggests {rule['compression']}",
+            current_value=props['compression'],
             correct_value=rule['compression'],
         )
     return None
+
+TEXTURE_CHECKS = {
+    "srgb": check_srgb,
+    "compression": check_compression,
+    "mipmaps": check_mipmaps,
+    "max_resolution": check_max_resolution,
+    "power_of_two": check_power_of_two,
+}

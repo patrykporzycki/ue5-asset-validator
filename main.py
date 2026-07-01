@@ -1,7 +1,7 @@
 import unreal
 import pathlib
 
-from core.texture_checker import check_power_of_two, check_max_resolution, check_mipmaps, check_srgb, check_compression, set_suffix_rules
+from core.texture_checker import TEXTURE_CHECKS, set_suffix_rules
 from editor.adapter import get_texture_properties
 from editor.fixer import fix_mipmaps, fix_power_of_two, fix_max_resolution, fix_srgb, fix_compression
 from core.rule_loader import load_rules
@@ -27,17 +27,9 @@ def run(config_path = None):
         texture_resolution_x = properties['resolution_x']
         texture_resolution_y = properties['resolution_y']
 
-        texture_checks = [
-            (check_power_of_two, [properties['resolution_x'], properties['resolution_y']]),
-            (check_max_resolution, [properties['resolution_x'], properties['resolution_y'], rules["max_resolution"]]),
-            (check_mipmaps, [properties['mipmaps']]),
-            (check_srgb, [properties['srgb'], properties['name']]),
-            (check_compression, [properties['compression'], properties['name']]),
-        ]
-
         texture_has_problems = False
-        for texture_check, texture_properties in texture_checks:
-            result = texture_check(*texture_properties)
+        for check_name, check_fn in TEXTURE_CHECKS.items():
+            result = check_fn(properties, rules)
             if result is not None:
                 texture_has_problems = True
                 unreal.log(f"{texture_name}: {result.message}")
