@@ -1,0 +1,12 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "Asset Validator",
+	"Description": "Automated asset auditing tool for Unreal Engine 5. Scans folders, detects issues and fixes them.",
+	"Category": "Editor",
+	"CreatedBy": "Patryk Porzycki",
+	"CanContainContent": true,
+	"EnabledByDefault": true,
+	"Modules": []
+}

@@ -1,4 +1,4 @@
-from core.texture_checker import check_power_of_two
+from Content.Python.core.texture_checker import check_power_of_two
 
 def test_pot():
     result = check_power_of_two(1024, 1024)
