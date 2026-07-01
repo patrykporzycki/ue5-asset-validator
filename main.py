@@ -46,7 +46,8 @@ def run(config_path = None):
                 elif result.id == "power_of_two":
                     fix_power_of_two(texture)
                 elif result.id == "max_resolution":
-                    fix_max_resolution(texture, rules["max_resolution"], texture_resolution_x, texture_resolution_y)
+                    fix_max_resolution(texture, rules["max_resolution"])
+                    unreal.log(f"Previous resolution: {texture_resolution_x}x{texture_resolution_y}")
                 elif result.id == "srgb":
                     fix_srgb(texture, result.correct_value)
                 elif result.id == "compression":
