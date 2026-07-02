@@ -1,46 +1,45 @@
 {
   "max_resolution": 2048,
   "suffix_rules": {
-    "_n": {"srgb": false, "compression": "TC_NORMALMAP"},
-    "_normal": {"srgb": false, "compression": "TC_NORMALMAP"},
-    "_nrm": {"srgb": false, "compression": "TC_NORMALMAP"},
+    "_n": {"srgb": false, "compression": ["TC_NORMALMAP", "TC_BC7"]},
+    "_normal": {"srgb": false, "compression": ["TC_NORMALMAP", "TC_BC7"]},
 
-    "_r": {"srgb": false, "compression": "TC_GRAYSCALE"},
-    "_roughness": {"srgb": false, "compression": "TC_GRAYSCALE"},
+    "_r": {"srgb": false, "compression": [["TC_GRAYSCALE"]]},
+    "_roughness": {"srgb": false, "compression": [["TC_GRAYSCALE"]]},
 
-    "_m": {"srgb": false, "compression": "TC_GRAYSCALE"},
-    "_metallic": {"srgb": false, "compression": "TC_GRAYSCALE"},
+    "_m": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
+    "_metallic": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
 
-    "_ao": {"srgb": false, "compression": "TC_GRAYSCALE"},
-    "_ambientocclusion": {"srgb": false, "compression": "TC_GRAYSCALE"},
-    "_ambient_occlusion": {"srgb": false, "compression": "TC_GRAYSCALE"},
+    "_ao": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
+    "_ambientocclusion": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
+    "_ambient_occlusion": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
 
-    "_orm": {"srgb": false, "compression": "TC_MASKS"},
-    "_arm": {"srgb": false, "compression": "TC_MASKS"},
+    "_orm": {"srgb": false, "compression": ["TC_MASKS"]},
+    "_arm": {"srgb": false, "compression": ["TC_MASKS"]},
 
-    "_masks": {"srgb": false, "compression": "TC_MASKS"},
-    "_mask": {"srgb": false, "compression": "TC_MASKS"},
+    "_masks": {"srgb": false, "compression": ["TC_MASKS"]},
+    "_mask": {"srgb": false, "compression": ["TC_MASKS"]},
 
-    "_d": {"srgb": true, "compression": "TC_BASECOLOR"},
-    "_diffuse": {"srgb": true, "compression": "TC_BASECOLOR"},
-    "_albedo": {"srgb": true, "compression": "TC_BASECOLOR"},
-    "_basecolor": {"srgb": true, "compression": "TC_BASECOLOR"},
-    "_base_color": {"srgb": true, "compression": "TC_BASECOLOR"},
-    "_col": {"srgb": true, "compression": "TC_BASECOLOR"},
-    "_color": {"srgb": true, "compression": "TC_BASECOLOR"},
+    "_d": {"srgb": true, "compression": ["TC_DEFAULT"]},
+    "_diffuse": {"srgb": true, "compression": ["TC_DEFAULT"]},
+    "_albedo": {"srgb": true, "compression": ["TC_DEFAULT"]},
+    "_basecolor": {"srgb": true, "compression": ["TC_DEFAULT"]},
+    "_base_color": {"srgb": true, "compression": ["TC_DEFAULT"]},
+    "_bc": {"srgb": true, "compression": ["TC_DEFAULT"]},
+    "_color": {"srgb": true, "compression": ["TC_DEFAULT"]},
 
-    "_spec": {"srgb": false, "compression": "TC_GRAYSCALE"},
-    "_specular": {"srgb": false, "compression": "TC_GRAYSCALE"},
+    "_spec": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
+    "_specular": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
 
-    "_opacity": {"srgb": false, "compression": "TC_GRAYSCALE"},
-    "_alpha": {"srgb": false, "compression": "TC_GRAYSCALE"},
+    "_opacity": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
+    "_alpha": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
 
-    "_e": {"srgb": true, "compression": "TC_BASECOLOR"},
-    "_emissive": {"srgb": true, "compression": "TC_BASECOLOR"},
+    "_e": {"srgb": true, "compression": ["TC_DEFAULT"]},
+    "_emissive": {"srgb": true, "compression": ["TC_DEFAULT"]},
 
-    "_h": {"srgb": false, "compression": "TC_DISPLACEMENT"},
-    "_height": {"srgb": false, "compression": "TC_DISPLACEMENT"},
-    "_disp": {"srgb": false, "compression": "TC_DISPLACEMENT"},
-    "_displacement": {"srgb": false, "compression": "TC_DISPLACEMENT"}
+    "_h": {"srgb": false, "compression": ["TC_DISPLACEMENT"]},
+    "_height": {"srgb": false, "compression": ["TC_DISPLACEMENT"]},
+    "_disp": {"srgb": false, "compression": ["TC_DISPLACEMENT"]},
+    "_displacement": {"srgb": false, "compression": ["TC_DISPLACEMENT"]}
 }
 }

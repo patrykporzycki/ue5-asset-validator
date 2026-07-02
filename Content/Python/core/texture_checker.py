@@ -79,7 +79,7 @@ def check_compression(props: dict, rules: dict) -> Alert | None:
             severity="warning",
             message=f"Compression setting is set to {props['compression']}, but texture name suggests {rule['compression']}",
             current_value=props['compression'],
-            correct_value=rule['compression'],
+            correct_value=str(rule['compression'][0]),
         )
     return None
 
