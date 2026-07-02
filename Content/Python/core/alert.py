@@ -5,6 +5,6 @@ class Alert:
     id : str
     severity: str
     message: str
-    current_value: str | bool
-    correct_value: str | bool | None
+    current_value: str
+    correct_value: str | None
 

@@ -63,8 +63,8 @@ def check_srgb(props: dict, rules: dict) -> Alert | None:
             id="srgb",
             severity="warning",
             message=f"sRGB setting is set to {props['srgb']}, but texture name suggests {rule['srgb']}",
-            current_value=props['srgb'],
-            correct_value=rule['srgb'],
+            current_value=str(props['srgb']),
+            correct_value=str(rule['srgb']),
         )
     return None
 
