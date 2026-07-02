@@ -73,7 +73,7 @@ def check_compression(props: dict, rules: dict) -> Alert | None:
     rule = _find_rule(props['name'])
     if rule is None:
         return None
-    if props['compression'] != rule['compression']:
+    if props['compression'] not in rule['compression']:
         return Alert(
             id="compression",
             severity="warning",
