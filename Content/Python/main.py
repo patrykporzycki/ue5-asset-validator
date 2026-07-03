@@ -5,6 +5,7 @@ from core.texture_checker import TEXTURE_CHECKS, set_suffix_rules
 from editor.adapter import get_texture_properties
 from editor.fixer import fix_mipmaps, fix_power_of_two, fix_max_resolution, fix_srgb, fix_compression
 from core.rule_loader import load_rules
+from editor.scanner import scan_folders
 
 CHECK_TO_FIXER = {
     "srgb": fix_srgb,
@@ -14,10 +15,13 @@ CHECK_TO_FIXER = {
     "power_of_two": fix_power_of_two,
 }
 
-def run(config_path = None):
+def run(config_path = None, asset_paths = None):
 
-    selection = unreal.EditorUtilityLibrary.get_selected_assets()
-    textures = [a for a in selection if isinstance(a, unreal.Texture2D)]
+    if asset_paths:
+        textures = scan_folders(asset_paths)
+    else:
+        selection = unreal.EditorUtilityLibrary.get_selected_assets()
+        textures = [a for a in selection if isinstance(a, unreal.Texture2D)]
 
     if not textures:
         unreal.log("No textures selected!")

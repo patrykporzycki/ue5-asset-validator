@@ -6,5 +6,5 @@ class Alert:
     severity: str
     message: str
     current_value: str
-    correct_value: str | None
+    correct_value: str | bool | int | None
 

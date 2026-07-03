@@ -7,7 +7,6 @@ def set_suffix_rules(rules: dict):
 
 
 def _is_power_of_two(n: int) -> bool:
-    # TODO: check if texture dimensions from UE5 are always positive integers
     return (n & (n - 1)) == 0
 
 def check_power_of_two(props: dict, rules: dict) -> Alert | None:
@@ -30,7 +29,7 @@ def check_max_resolution(props: dict, rules: dict) -> Alert | None:
             severity="warning",
             message=f"Resolution {props['resolution_x']}x{props['resolution_y']} exceeds {rules['max_resolution']}!",
             current_value=str(current_resolution),
-            correct_value=str(rules['max_resolution'])
+            correct_value=rules['max_resolution']
         )
     return None
 
@@ -64,7 +63,7 @@ def check_srgb(props: dict, rules: dict) -> Alert | None:
             severity="warning",
             message=f"sRGB setting is set to {props['srgb']}, but texture name suggests {rule['srgb']}",
             current_value=str(props['srgb']),
-            correct_value=str(rule['srgb']),
+            correct_value=rule['srgb'],
         )
     return None
 
@@ -79,7 +78,7 @@ def check_compression(props: dict, rules: dict) -> Alert | None:
             severity="warning",
             message=f"Compression setting is set to {props['compression']}, but texture name suggests {rule['compression']}",
             current_value=props['compression'],
-            correct_value=str(rule['compression'][0]),
+            correct_value=rule['compression'][0],
         )
     return None
 
