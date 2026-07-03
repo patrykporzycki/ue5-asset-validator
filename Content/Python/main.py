@@ -6,6 +6,7 @@ from editor.adapter import get_texture_properties
 from editor.fixer import fix_mipmaps, fix_power_of_two, fix_max_resolution, fix_srgb, fix_compression
 from core.rule_loader import load_rules
 from editor.scanner import scan_folders
+from core.validator import validate
 
 CHECK_TO_FIXER = {
     "srgb": fix_srgb,
@@ -33,18 +34,16 @@ def run(config_path = None, asset_paths = None):
     set_suffix_rules(rules["suffix_rules"])
 
     unreal.log(f"Checking {len(textures)} textures...")
+
     for texture in textures:
         properties = get_texture_properties(texture)
         texture_name = properties['name']
 
-        texture_has_problems = False
-        for check_name, check_fn in TEXTURE_CHECKS.items():
-            alert = check_fn(properties, rules)
-            if alert is not None:
-                texture_has_problems = True
-                unreal.log(f"{texture_name}: {alert.message}")
-                CHECK_TO_FIXER[alert.id](texture, alert)
-        if not texture_has_problems:
+        alerts = validate(properties, rules)
+        for alert in alerts:
+            unreal.log(f"{texture_name}: {alert.message}")
+            CHECK_TO_FIXER[alert.id](texture, alert)
+        if not alerts:
             unreal.log(f"{texture_name}: OK")
 
 

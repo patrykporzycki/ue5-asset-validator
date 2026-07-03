@@ -1,4 +1,5 @@
 import unreal
+
 def scan_folders(paths):
     EditorAssetLibrary = unreal.EditorAssetLibrary
     assets = []
