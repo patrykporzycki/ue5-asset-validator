@@ -1,4 +1,4 @@
-from core.alert import Alert
+from core.types import Alert
 
 _SUFFIX_RULES = {}
 

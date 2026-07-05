@@ -4,7 +4,7 @@ import pathlib
 from core.texture_checker import set_suffix_rules
 from core.rule_loader import load_rules
 from editor.scanner import scan_folders
-from editor.reporter import make_report
+from editor.runner import audit, fix
 
 def run(config_path = None, asset_paths = None):
 
@@ -32,15 +32,23 @@ def run(config_path = None, asset_paths = None):
     set_suffix_rules(rules["suffix_rules"])
 
     unreal.log(f"Checking {len(asset_datas)} assets...")
-    reported_assets = make_report(asset_datas, rules)
+    reported_assets = audit(asset_datas, rules)
+    fixed_assets = fix(reported_assets, rules)
 
     for asset in reported_assets:
-        texture_name = asset.name
         for alert in asset.alerts:
-            unreal.log(f"{texture_name}: {alert.message}")
+            unreal.log(f"{asset.name}: {alert.message}")
         if not asset.alerts:
-            unreal.log(f"{texture_name}: OK")
+            unreal.log(f"{asset.name}: OK")
 
+    fixed = sum(1 for f in fixed_assets if f.status == "fixed")
+    skipped = sum(1 for f in fixed_assets if f.status == "skipped")
+    failed = sum(1 for f in fixed_assets if f.status == "failed")
+    unreal.log(f"Fix results: {fixed} fixed, {skipped} skipped, {failed} failed")
+
+    for fixed_asset in fixed_assets:
+        if fixed_asset.status == "failed":
+            unreal.log_error(f"  {fixed_asset.name}: [{fixed_asset.alert}] {fixed_asset.message} — {fixed_asset.error}")
 
 
 

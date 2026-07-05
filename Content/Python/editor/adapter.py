@@ -1,6 +1,6 @@
 import unreal
 
-def get_asset_properties (asset_data: unreal.AssetData):
+def get_asset_properties(asset_data: unreal.AssetData):
 
     dimensions = asset_data.get_tag_value("Dimensions")
     asset_properties = {
@@ -9,6 +9,7 @@ def get_asset_properties (asset_data: unreal.AssetData):
         "resolution_y": int(dimensions.split("x")[1]),
         "compression": asset_data.get_tag_value("CompressionSettings").upper(),
         "srgb": asset_data.get_tag_value("SRGB") == "True",
-        "mipmaps": asset_data.get_tag_value("MipGenSettings")
+        "mipmaps": asset_data.get_tag_value("MipGenSettings"),
+        "estimated_size": int(dimensions.split("x")[0])*int(dimensions.split("x")[1])*4
     }
     return asset_properties
