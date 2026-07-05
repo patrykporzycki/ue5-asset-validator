@@ -1,49 +1,44 @@
 import unreal
 import pathlib
 
-from core.texture_checker import TEXTURE_CHECKS, set_suffix_rules
-from editor.adapter import get_texture_properties
-from editor.fixer import fix_mipmaps, fix_power_of_two, fix_max_resolution, fix_srgb, fix_compression
+from core.texture_checker import set_suffix_rules
 from core.rule_loader import load_rules
 from editor.scanner import scan_folders
-from core.validator import validate
-
-CHECK_TO_FIXER = {
-    "srgb": fix_srgb,
-    "compression": fix_compression,
-    "mipmaps": fix_mipmaps,
-    "max_resolution": fix_max_resolution,
-    "power_of_two": fix_power_of_two,
-}
+from editor.reporter import make_report
 
 def run(config_path = None, asset_paths = None):
 
     if asset_paths:
-        textures = scan_folders(asset_paths)
+        asset_datas = scan_folders(asset_paths)
     else:
         selection = unreal.EditorUtilityLibrary.get_selected_assets()
-        textures = [a for a in selection if isinstance(a, unreal.Texture2D)]
+        registry = unreal.AssetRegistryHelpers.get_asset_registry()
+        asset_datas=[]
+        for asset in selection:
+            if isinstance(asset, unreal.Texture2D):
+                a = registry.get_asset_by_object_path(asset.get_path_name())
+                asset_datas.append(a)
 
-    if not textures:
-        unreal.log("No textures selected!")
+    if len(asset_datas) == 0:
+        unreal.log("Nothing selected!")
         return
 
     if config_path is None:
         config_path = pathlib.Path(__file__).parent / "config" / "validation_rules.json"
+
     rules = load_rules(config_path)
+    if rules is None:
+        return
     set_suffix_rules(rules["suffix_rules"])
 
-    unreal.log(f"Checking {len(textures)} textures...")
+    unreal.log(f"Checking {len(asset_datas)} assets...")
+    reported_assets = make_report(asset_datas, rules)
 
-    for texture in textures:
-        properties = get_texture_properties(texture)
-        texture_name = properties['name']
-
-        alerts = validate(properties, rules)
-        for alert in alerts:
+    for asset in reported_assets:
+        texture_name = asset.name
+        for alert in asset.alerts:
             unreal.log(f"{texture_name}: {alert.message}")
-            CHECK_TO_FIXER[alert.id](texture, alert)
-        if not alerts:
+        if not asset.alerts:
             unreal.log(f"{texture_name}: OK")
 
 

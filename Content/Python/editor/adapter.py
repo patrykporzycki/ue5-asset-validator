@@ -1,12 +1,14 @@
 import unreal
 
-def get_texture_properties (texture: unreal.Texture2D):
-    texture_properties = {
-        "name": str(texture.get_fname()),
-        "resolution_x": texture.blueprint_get_size_x(),
-        "resolution_y": texture.blueprint_get_size_y(),
-        "compression": texture.get_editor_property("compression_settings").name,
-        "srgb": texture.get_editor_property("srgb"),
-        "mipmaps": texture.get_editor_property("mip_gen_settings").name
+def get_asset_properties (asset_data: unreal.AssetData):
+
+    dimensions = asset_data.get_tag_value("Dimensions")
+    asset_properties = {
+        "name": str(asset_data.asset_name),
+        "resolution_x": int(dimensions.split("x")[0]),
+        "resolution_y": int(dimensions.split("x")[1]),
+        "compression": asset_data.get_tag_value("CompressionSettings").upper(),
+        "srgb": asset_data.get_tag_value("SRGB") == "True",
+        "mipmaps": asset_data.get_tag_value("MipGenSettings")
     }
-    return texture_properties
+    return asset_properties

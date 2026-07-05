@@ -1,5 +1,5 @@
 import unreal
-from core.alert import Alert
+from core.types import Alert
 
 def _fix_property(texture: unreal.Texture2D, property_name: str, correct_value, label: str):
     previous_property = texture.get_editor_property(property_name)

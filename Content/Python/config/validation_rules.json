@@ -1,13 +1,19 @@
 {
   "max_resolution": 2048,
+  "allow_autofix": {
+    "power_of_two": false,
+    "max_resolution": false,
+    "mipmaps": true,
+    "srgb": true,
+    "compression": true
+  },
   "suffix_rules": {
     "_n": {"srgb": false, "compression": ["TC_NORMALMAP", "TC_BC7"]},
     "_normal": {"srgb": false, "compression": ["TC_NORMALMAP", "TC_BC7"]},
 
-    "_r": {"srgb": false, "compression": [["TC_GRAYSCALE"]]},
-    "_roughness": {"srgb": false, "compression": [["TC_GRAYSCALE"]]},
+    "_r": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
+    "_roughness": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
 
-    "_m": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
     "_metallic": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
 
     "_ao": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
@@ -19,6 +25,7 @@
 
     "_masks": {"srgb": false, "compression": ["TC_MASKS"]},
     "_mask": {"srgb": false, "compression": ["TC_MASKS"]},
+    "_m": {"srgb": false, "compression": ["TC_MASKS"]},
 
     "_d": {"srgb": true, "compression": ["TC_DEFAULT"]},
     "_diffuse": {"srgb": true, "compression": ["TC_DEFAULT"]},
