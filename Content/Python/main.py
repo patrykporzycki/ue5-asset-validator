@@ -48,7 +48,7 @@ def run(config_path = None, asset_paths = None):
 
     for fixed_asset in fixed_assets:
         if fixed_asset.status == "failed":
-            unreal.log_error(f"  {fixed_asset.name}: [{fixed_asset.alert}] {fixed_asset.message} — {fixed_asset.error}")
+            unreal.log_error(f"  {fixed_asset.name}: [{fixed_asset.alert}] — {fixed_asset.error}")
 
 
 

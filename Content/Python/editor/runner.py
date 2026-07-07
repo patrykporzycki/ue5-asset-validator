@@ -2,14 +2,13 @@ import unreal
 from editor.adapter import get_asset_properties
 from core.types import Report, FixResult
 from core.validator import validate
-from editor.fixer import fix_mipmaps, fix_power_of_two, fix_max_resolution, fix_srgb, fix_compression
+from editor.fixer import fix_mipmaps, fix_max_resolution, fix_srgb, fix_compression
 
 CHECK_TO_FIXER = {
     "srgb": fix_srgb,
     "compression": fix_compression,
     "mipmaps": fix_mipmaps,
     "max_resolution": fix_max_resolution,
-    "power_of_two": fix_power_of_two,
 }
 
 _MEMORY_BUDGET = 256 * 1024 * 1024
