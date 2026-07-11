@@ -7,6 +7,28 @@
     "srgb": true,
     "compression": true
   },
+  "prefix_rules": {
+    "Texture2D": "T_",
+    "StaticMesh": "SM_",
+    "Material": "M_",
+    "MaterialInstanceConstant": "MI_",
+    "Blueprint": "BP_",
+    "WidgetBlueprint": "WBP_",
+    "AnimBlueprint": "ABP_",
+    "SkeletalMesh": "SK_",
+    "PhysicsAsset": "PHYS_",
+    "NiagaraSystem": "NS_",
+    "NiagaraEmitter": "NE_",
+    "SoundWave": "S_",
+    "SoundCue": "SC_",
+    "ParticleSystem": "P_",
+    "DataTable": "DT_",
+    "CurveTable": "CT_",
+    "TextureRenderTarget2D": "RT_",
+    "Level": "L_",
+    "World": "L_",
+    "ControlRig": "CR_"
+  },
   "suffix_rules": {
     "_n": {"srgb": false, "compression": ["TC_NORMALMAP", "TC_BC7"]},
     "_normal": {"srgb": false, "compression": ["TC_NORMALMAP", "TC_BC7"]},
@@ -48,5 +70,5 @@
     "_height": {"srgb": false, "compression": ["TC_DISPLACEMENT"]},
     "_disp": {"srgb": false, "compression": ["TC_DISPLACEMENT"]},
     "_displacement": {"srgb": false, "compression": ["TC_DISPLACEMENT"]}
-}
+  }
 }

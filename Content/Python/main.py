@@ -1,7 +1,6 @@
 import unreal
 import pathlib
 
-from editor.validators.texture_properties.texture_checker import set_suffix_rules
 from core.rule_loader import load_rules
 from editor.scanner import scan_folders
 from editor.runner import audit, fix
@@ -38,7 +37,6 @@ def run(config_path = None, asset_paths = None):
     rules = load_rules(config_path)
     if rules is None:
         return
-    set_suffix_rules(rules["suffix_rules"])
 
     unreal.log(f"Checking {len(asset_datas)} assets...")
     reported_assets = audit(asset_datas, rules)

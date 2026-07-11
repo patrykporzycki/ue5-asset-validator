@@ -2,7 +2,11 @@ from __future__ import annotations
 from core.types import Check
 from core.types import Alert, Severity
 
-_SUFFIX_RULES = {}
+def _find_rule(texture_name: str, suffix_rules: dict) -> dict | None:
+    for suffix, rule in suffix_rules.items():
+        if texture_name.lower().endswith(suffix):
+            return rule
+    return None
 
 def _fix_property(texture: unreal.Texture2D, property_name: str, correct_value, label: str):
     import unreal
@@ -14,9 +18,6 @@ def _fix_property(texture: unreal.Texture2D, property_name: str, correct_value, 
 
     unreal.log(f"Fixed {label} on {texture.get_fname()}: {previous_property.name if hasattr(previous_property, 'name') else previous_property} -> {new_property.name if hasattr(new_property, 'name') else new_property}")
     return True
-
-def set_suffix_rules(rules: dict):
-    _SUFFIX_RULES.update(rules)
 
 def _is_power_of_two(n: int) -> bool:
     return (n & (n - 1)) == 0
@@ -73,18 +74,14 @@ class MipmapCheck(Check):
         import unreal
         return _fix_property(asset, "mip_gen_settings", unreal.TextureMipGenSettings.TMGS_FROM_TEXTURE_GROUP,"mipmaps")
 
-def _find_rule(texture_name: str) -> dict | None:
-    for suffix, rule in _SUFFIX_RULES.items():
-        if texture_name.lower().endswith(suffix):
-            return rule
-    return None
+
 
 class SrgbCheck(Check):
     alert_id = "srgb"
     severity = Severity.WARNING.value
 
     def check(self, props: dict, rules: dict) -> Alert | None:
-        rule = _find_rule(props['name'])
+        rule = _find_rule(props['name'], rules['suffix_rules'])
         if rule is None:
             return None
         if props['srgb'] != rule['srgb']:
@@ -104,7 +101,7 @@ class CompressionCheck(Check):
     severity = Severity.WARNING.value
 
     def check(self, props: dict, rules: dict) -> Alert | None:
-        rule = _find_rule(props['name'])
+        rule = _find_rule(props['name'], rules['suffix_rules'])
         if rule is None:
             return None
         if props['compression'] not in rule['compression']:
