@@ -20,7 +20,7 @@ def _fix_property(texture: unreal.Texture2D, property_name: str, correct_value, 
     return True
 
 def _is_power_of_two(n: int) -> bool:
-    return (n & (n - 1)) == 0
+    return n > 0 and (n & (n - 1)) == 0
 
 class PowerOfTwoCheck(Check):
     alert_id = "power_of_two"

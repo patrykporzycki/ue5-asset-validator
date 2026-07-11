@@ -12,7 +12,7 @@ class NamingConventionCheck(Check):
         if not correct_prefix:
             return None
 
-        if not props['asset_class'].startswith(correct_prefix):
+        if not props['name'].startswith(correct_prefix):
             return Alert(
                 id=self.alert_id,
                 severity=self.severity,
