@@ -1,7 +1,8 @@
 from editor.validators.texture_properties.texture_checker import TEXTURE_CHECKS
 from editor.validators.texture_properties.texture_adapter import TextureAdapter
+from editor.validators.static_mesh_properties.static_mesh_adapter import StaticMeshAdapter
+from editor.validators.static_mesh_properties.static_mesh_checker import STATIC_MESH_CHECKS
 from core.types import RegistryEntry
-
 
 VALIDATOR_REGISTRY = {
     "texture_properties": RegistryEntry(
@@ -9,4 +10,11 @@ VALIDATOR_REGISTRY = {
         applies_to=["Texture2D"],
         adapter=TextureAdapter(),
         checks=TEXTURE_CHECKS,
-    )}
+    ),
+    "static_mesh_properties": RegistryEntry(
+        name="static_mesh_properties",
+        applies_to=["StaticMesh"],
+        adapter=StaticMeshAdapter(),
+        checks = STATIC_MESH_CHECKS,
+    )
+}

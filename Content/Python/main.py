@@ -9,6 +9,9 @@ from editor.registry import VALIDATOR_REGISTRY
 
 def run(config_path = None, asset_paths = None):
 
+    asset_registry = unreal.AssetRegistryHelpers.get_asset_registry()
+    asset_registry.search_all_assets(True)
+
     class_names = []
     for registry in VALIDATOR_REGISTRY.values():
         for apply in registry.applies_to:
@@ -20,7 +23,6 @@ def run(config_path = None, asset_paths = None):
         selection = unreal.EditorUtilityLibrary.get_selected_assets()
         asset_datas=[]
         for asset in selection:
-            asset_registry = unreal.AssetRegistryHelpers.get_asset_registry()
             a = asset_registry.get_asset_by_object_path(asset.get_path_name())
             if a and str(a.asset_class_path.asset_name) in class_names:
                     asset_datas.append(a)

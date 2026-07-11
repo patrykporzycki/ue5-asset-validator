@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+import time
 from typing import Callable
 
 class Severity(Enum):
@@ -8,6 +9,15 @@ class Severity(Enum):
     CRITICAL = "critical"
 
 class AssetAdapter:
+    @staticmethod
+    def get_tag(asset_data, tag_name):
+        for _ in range(10):  # max 1 sekunda
+            val = asset_data.get_tag_value(tag_name)
+            if val is not None:
+                return val  # druga próba
+            time.sleep(0.01)
+        return "0"
+
     def get_properties(self, asset_data):
         raise NotImplementedError
 
