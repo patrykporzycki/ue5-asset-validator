@@ -1,23 +1,30 @@
 import unreal
 import pathlib
 
-from core.texture_checker import set_suffix_rules
+from editor.validators.texture_properties.texture_checker import set_suffix_rules
 from core.rule_loader import load_rules
 from editor.scanner import scan_folders
 from editor.runner import audit, fix
+from editor.registry import VALIDATOR_REGISTRY
 
 def run(config_path = None, asset_paths = None):
 
+    class_names = []
+    for registry in VALIDATOR_REGISTRY.values():
+        for apply in registry.applies_to:
+            if apply not in class_names and apply != "*":
+                class_names.append(apply)
     if asset_paths:
-        asset_datas = scan_folders(asset_paths)
+        asset_datas = scan_folders(asset_paths, class_names)
     else:
         selection = unreal.EditorUtilityLibrary.get_selected_assets()
-        registry = unreal.AssetRegistryHelpers.get_asset_registry()
         asset_datas=[]
         for asset in selection:
-            if isinstance(asset, unreal.Texture2D):
-                a = registry.get_asset_by_object_path(asset.get_path_name())
-                asset_datas.append(a)
+            asset_registry = unreal.AssetRegistryHelpers.get_asset_registry()
+            a = asset_registry.get_asset_by_object_path(asset.get_path_name())
+            if a and str(a.asset_class_path.asset_name) in class_names:
+                    asset_datas.append(a)
+
 
     if len(asset_datas) == 0:
         unreal.log("Nothing selected!")

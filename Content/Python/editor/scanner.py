@@ -1,11 +1,11 @@
 import unreal
 
-def scan_folders(paths):
+def scan_folders(paths, class_names):
 
     ar_filter = unreal.ARFilter(
         package_paths=paths,
         recursive_paths=True,
-        class_names=["Texture2D"]
+        class_names=class_names,
     )
 
     registry = unreal.AssetRegistryHelpers.get_asset_registry()

@@ -1,9 +1,10 @@
-from core.texture_checker import TEXTURE_CHECKS
+from core.types import Check
 
-def validate(properties, rules):
+
+def validate(properties, rules, checks : list[Check]):
     alerts = []
-    for check_name, check_fn in TEXTURE_CHECKS.items():
-        alert = check_fn(properties, rules)
+    for check in checks:
+        alert = check.check(properties, rules)
         if alert is not None:
             alerts.append(alert)
     return alerts
