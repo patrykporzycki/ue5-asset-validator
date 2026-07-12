@@ -19,7 +19,7 @@ class LODsCheck(Check):
 
 class CollisionsCheck(Check):
     alert_id = "collisions"
-    severity = Severity.WARNING.value
+    severity = Severity.WARNING
 
     def check(self, props: dict, rules: dict) -> Alert | None:
         if props['collisions'] == 0:

@@ -43,7 +43,7 @@ class PowerOfTwoCheck(Check):
 
 class MaxResolutionCheck(Check):
     alert_id = "max_resolution"
-    severity = Severity.WARNING.value
+    severity = Severity.WARNING
 
     def check(self, props: dict, rules: dict) -> Alert | None:
         current_resolution = max(props['resolution_x'], props['resolution_y'])
@@ -62,7 +62,7 @@ class MaxResolutionCheck(Check):
 
 class MipmapCheck(Check):
     alert_id = "mipmaps"
-    severity = Severity.WARNING.value
+    severity = Severity.WARNING
 
     def check(self, props: dict, rules: dict) -> Alert | None:
         if props['mipmaps'] == "TMGS_NO_MIPMAPS":
@@ -81,7 +81,7 @@ class MipmapCheck(Check):
 
 class SrgbCheck(Check):
     alert_id = "srgb"
-    severity = Severity.WARNING.value
+    severity = Severity.WARNING
 
     def check(self, props: dict, rules: dict) -> Alert | None:
         rule = _find_rule(props['name'], rules['suffix_rules'])
@@ -101,7 +101,7 @@ class SrgbCheck(Check):
 
 class CompressionCheck(Check):
     alert_id = "compression"
-    severity = Severity.WARNING.value
+    severity = Severity.WARNING
 
     def check(self, props: dict, rules: dict) -> Alert | None:
         rule = _find_rule(props['name'], rules['suffix_rules'])
