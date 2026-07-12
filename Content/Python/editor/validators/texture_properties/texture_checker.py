@@ -2,6 +2,11 @@ from __future__ import annotations
 from core.types import Check
 from core.types import Alert, Severity
 
+try:
+    import unreal
+except ImportError:
+    unreal = None
+
 def _find_rule(texture_name: str, suffix_rules: dict) -> dict | None:
     for suffix, rule in suffix_rules.items():
         if texture_name.lower().endswith(suffix):
@@ -9,7 +14,6 @@ def _find_rule(texture_name: str, suffix_rules: dict) -> dict | None:
     return None
 
 def _fix_property(texture: unreal.Texture2D, property_name: str, correct_value, label: str):
-    import unreal
     previous_property = texture.get_editor_property(property_name)
 
     with unreal.ScopedEditorTransaction(f"Fix {label}"):
@@ -71,7 +75,6 @@ class MipmapCheck(Check):
             )
         return None
     def fix(self, asset, alert):
-        import unreal
         return _fix_property(asset, "mip_gen_settings", unreal.TextureMipGenSettings.TMGS_FROM_TEXTURE_GROUP,"mipmaps")
 
 
@@ -114,7 +117,6 @@ class CompressionCheck(Check):
             )
         return None
     def fix(self, asset, alert):
-        import unreal
         return _fix_property(asset, "compression_settings", getattr(unreal.TextureCompressionSettings, alert.correct_value), "compression")
 
 TEXTURE_CHECKS = [

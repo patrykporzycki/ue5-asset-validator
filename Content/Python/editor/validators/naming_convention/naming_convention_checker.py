@@ -1,4 +1,3 @@
-from __future__ import annotations
 from core.types import Check
 from core.types import Alert, Severity
 
