@@ -11,11 +11,14 @@ def run(config_path = None, asset_paths = None):
     asset_registry = unreal.AssetRegistryHelpers.get_asset_registry()
     asset_registry.search_all_assets(True)
 
+    wildcard = any("*" in r.applies_to for r in VALIDATOR_REGISTRY.values())
+
     class_names = []
-    for registry in VALIDATOR_REGISTRY.values():
-        for apply in registry.applies_to:
-            if apply not in class_names and apply != "*":
-                class_names.append(apply)
+    if not wildcard:
+        for registry in VALIDATOR_REGISTRY.values():
+            for apply in registry.applies_to:
+                if apply not in class_names and apply != "*":
+                    class_names.append(apply)
     if asset_paths:
         asset_datas = scan_folders(asset_paths, class_names)
     else:
