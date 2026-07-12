@@ -32,6 +32,7 @@ def fix(reports: list, rules: dict):
                 break
             try:
                 asset = unreal.EditorAssetLibrary.load_asset(str(report.path))
+                save_fixed = False
                 for alert in report.alerts:
                     fixed = False
                     if rules["allow_autofix"].get(alert.id, False):
@@ -43,6 +44,7 @@ def fix(reports: list, rules: dict):
                                         fix_result = FixResult(report.name,alert.id, "fixed")
                                         fix_results.append(fix_result)
                                         fixed = True
+                                        save_fixed = True
                                         break
                             if fixed:
                                 break
@@ -52,7 +54,8 @@ def fix(reports: list, rules: dict):
                     else:
                         fix_result = FixResult(report.name, alert.id, "skipped")
                         fix_results.append(fix_result)
-                unreal.EditorAssetLibrary.save_loaded_asset(asset)
+                if save_fixed:
+                    unreal.EditorAssetLibrary.save_loaded_asset(asset)
                 accumulated_bytes += report.estimated_size
                 slow_task.enter_progress_frame(1)
                 if accumulated_bytes > _MEMORY_BUDGET:
