@@ -28,7 +28,7 @@ def _is_power_of_two(n: int) -> bool:
 
 class PowerOfTwoCheck(Check):
     alert_id = "power_of_two"
-    severity = Severity.WARNING.value
+    severity = Severity.WARNING
 
     def check(self, props: dict, rules: dict) -> Alert | None:
         if _is_power_of_two(props['resolution_x']) and _is_power_of_two(props['resolution_y']):

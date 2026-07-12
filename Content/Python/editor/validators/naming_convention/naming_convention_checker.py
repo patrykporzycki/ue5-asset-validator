@@ -3,7 +3,7 @@ from core.types import Alert, Severity
 
 class NamingConventionCheck(Check):
     alert_id = "naming_convention"
-    severity = Severity.WARNING.value
+    severity = Severity.WARNING
 
     def check(self, props: dict, rules: dict) -> Alert | None:
 

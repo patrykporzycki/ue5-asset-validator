@@ -23,7 +23,7 @@ class AssetAdapter:
 @dataclass(frozen=True)
 class Alert:
     id : str
-    severity: str
+    severity: Severity
     message: str
     current_value: str
     correct_value: str | bool | int | None
@@ -52,7 +52,7 @@ class RegistryEntry:
 
 class Check:
     alert_id: str = ""
-    severity: str = Severity.WARNING.value
+    severity: Severity = Severity.WARNING
 
     def __init_subclass__(cls):
         if cls.alert_id == "":

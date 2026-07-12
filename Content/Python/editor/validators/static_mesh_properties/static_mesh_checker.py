@@ -4,7 +4,7 @@ from core.types import Alert, Severity
 
 class LODsCheck(Check):
     alert_id = "lods"
-    severity = Severity.WARNING.value
+    severity = Severity.WARNING
 
     def check(self, props: dict, rules: dict) -> Alert | None:
         if props['lods'] == 1 :
