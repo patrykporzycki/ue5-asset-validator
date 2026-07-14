@@ -26,7 +26,7 @@ def run(config_path = None, asset_paths = None):
         asset_datas=[]
         for asset in selection:
             a = asset_registry.get_asset_by_object_path(asset.get_path_name())
-            if a and str(a.asset_class_path.asset_name) in class_names:
+            if a and (wildcard or str(a.asset_class_path.asset_name) in class_names):
                     asset_datas.append(a)
 
 
