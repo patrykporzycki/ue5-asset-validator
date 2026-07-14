@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-import time
 
 class Severity(Enum):
     WARNING = "warning"
@@ -10,12 +9,10 @@ class Severity(Enum):
 class AssetAdapter:
     @staticmethod
     def get_tag(asset_data, tag_name):
-        for _ in range(10):
-            val = asset_data.get_tag_value(tag_name)
-            if val is not None:
-                return val
-            time.sleep(0.01)
-        return "0"
+        val = asset_data.get_tag_value(tag_name)
+        if val is None:
+            raise ValueError(f"Tag {tag_name} not found on {asset_data}. Tag may not be cached yet!")
+        return val
 
     def get_properties(self, asset_data):
         raise NotImplementedError

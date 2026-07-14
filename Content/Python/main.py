@@ -8,9 +8,6 @@ from editor.registry import VALIDATOR_REGISTRY
 
 def run(config_path = None, asset_paths = None):
 
-    asset_registry = unreal.AssetRegistryHelpers.get_asset_registry()
-    asset_registry.search_all_assets(True)
-
     wildcard = any("*" in r.applies_to for r in VALIDATOR_REGISTRY.values())
 
     class_names = []
@@ -23,11 +20,10 @@ def run(config_path = None, asset_paths = None):
         asset_datas = scan_folders(asset_paths, class_names)
     else:
         selection = unreal.EditorUtilityLibrary.get_selected_assets()
-        asset_datas=[]
-        for asset in selection:
-            a = asset_registry.get_asset_by_object_path(asset.get_path_name())
-            if a and (wildcard or str(a.asset_class_path.asset_name) in class_names):
-                    asset_datas.append(a)
+        paths = {str(asset.get_path_name()) for asset in selection}
+        folders = {unreal.Paths.get_path(p) for p in paths}
+        scanned_asset_datas = scan_folders(folders, class_names)
+        asset_datas = [a for a in scanned_asset_datas if str(a.package_name) + "." + str(a.asset_name) in paths]
 
 
     if len(asset_datas) == 0:
