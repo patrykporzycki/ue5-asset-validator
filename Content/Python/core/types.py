@@ -47,11 +47,15 @@ class RegistryEntry:
 class Check:
     alert_id: str = ""
     severity: Severity = Severity.WARNING
+    is_fixable: bool = False
 
     def __init_subclass__(cls):
         if cls.alert_id == "":
             raise TypeError("Alert ID not provided!")
     def check(self, properties, rules) -> Alert : raise NotImplementedError
+
+    def fix(self, properties, rules) -> bool :
+        return False
 
 
 

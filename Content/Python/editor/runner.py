@@ -47,7 +47,7 @@ def fix(reports: list, rules: dict):
                                 for validator_name, validator in VALIDATOR_REGISTRY.items():
                                     if grouped_report.type in validator.applies_to or "*" in validator.applies_to:
                                         for check in validator.checks:
-                                            if hasattr(check, 'fix') and check.alert_id == alert.id:
+                                            if check.is_fixable and check.alert_id == alert.id:
                                                 check.fix(asset, alert)
                                                 fix_result = FixResult(grouped_report.name, alert.id, "fixed")
                                                 fix_results.append(fix_result)
