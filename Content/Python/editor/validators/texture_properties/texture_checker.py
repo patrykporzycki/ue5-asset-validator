@@ -16,8 +16,7 @@ def _find_rule(texture_name: str, suffix_rules: dict) -> dict | None:
 def _fix_property(texture: unreal.Texture2D, property_name: str, correct_value, label: str):
     previous_property = texture.get_editor_property(property_name)
 
-    with unreal.ScopedEditorTransaction(f"Fix {label}"):
-        texture.set_editor_property(property_name, correct_value)
+    texture.set_editor_property(property_name, correct_value)
     new_property = texture.get_editor_property(property_name)
 
     unreal.log(f"Fixed {label} on {texture.get_fname()}: {previous_property.name if hasattr(previous_property, 'name') else previous_property} -> {new_property.name if hasattr(new_property, 'name') else new_property}")
