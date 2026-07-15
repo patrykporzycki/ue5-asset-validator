@@ -8,17 +8,25 @@ _MEMORY_BUDGET = 256 * 1024 * 1024
 def audit(asset_datas: unreal.AssetData, rules: dict):
     reports = []
     for asset_data in asset_datas:
-        asset_class = str(asset_data.asset_class_path.asset_name)
-        for validator_name, validator in VALIDATOR_REGISTRY.items():
-            if asset_class in validator.applies_to or "*" in validator.applies_to:
-                properties = validator.adapter.get_properties(asset_data)
-                alerts = validate(properties, rules, validator.checks)
-                report = Report(asset_data.package_name,
-                                properties["name"],
-                                asset_class,
-                                properties["estimated_size"],
-                                alerts)
-                reports.append(report)
+        try:
+            asset_class = str(asset_data.asset_class_path.asset_name)
+            for validator_name, validator in VALIDATOR_REGISTRY.items():
+                try:
+                    if asset_class in validator.applies_to or "*" in validator.applies_to:
+                        properties = validator.adapter.get_properties(asset_data)
+                        alerts = validate(properties, rules, validator.checks)
+                        report = Report(asset_data.package_name,
+                                        properties["name"],
+                                        asset_class,
+                                        properties["estimated_size"],
+                                        alerts)
+                        reports.append(report)
+                except Exception:
+                    unreal.log_warning(f"Validator {validator_name} failed to audit asset {asset_data.asset_class_path.asset_name}")
+                    continue
+        except Exception:
+            unreal.log_warning(f"Failed to audit asset {asset_data.asset_class_path.asset_name}")
+            continue
     return reports
 
 def fix(reports: list, rules: dict):
@@ -48,8 +56,11 @@ def fix(reports: list, rules: dict):
                                     if grouped_report.type in validator.applies_to or "*" in validator.applies_to:
                                         for check in validator.checks:
                                             if check.is_fixable and check.alert_id == alert.id:
-                                                check.fix(asset, alert)
-                                                fix_result = FixResult(grouped_report.name, alert.id, "fixed")
+                                                try:
+                                                    check.fix(asset, alert)
+                                                    fix_result = FixResult(grouped_report.name, alert.id, "fixed")
+                                                except Exception:
+                                                    fix_result = FixResult(grouped_report.name, alert.id, "failed", "Failed to fix asset")
                                                 fix_results.append(fix_result)
                                                 fixed = True
                                                 save_fixed = True

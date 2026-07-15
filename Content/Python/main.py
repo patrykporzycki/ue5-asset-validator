@@ -33,8 +33,10 @@ def run(config_path = None, asset_paths = None):
     if config_path is None:
         config_path = pathlib.Path(__file__).parent / "config" / "validation_rules.json"
 
-    rules = load_rules(config_path)
-    if rules is None:
+    try:
+        rules = load_rules(config_path)
+    except (FileNotFoundError, ValueError) as e:
+        unreal.log_error(str(e))
         return
 
     unreal.log(f"Checking {len(asset_datas)} assets...")

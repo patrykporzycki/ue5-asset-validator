@@ -1,6 +1,6 @@
 import json
 
-def load_rules(rules_path: str) -> dict | None:
+def load_rules(rules_path: str) -> dict:
     try:
         with open(rules_path, "r") as f:
             rules = json.load(f)
