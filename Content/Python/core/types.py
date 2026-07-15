@@ -9,10 +9,7 @@ class Severity(Enum):
 class AssetAdapter:
     @staticmethod
     def get_tag(asset_data, tag_name):
-        val = asset_data.get_tag_value(tag_name)
-        if val is None:
-            raise ValueError(f"Tag {tag_name} not found on {asset_data}. Tag may not be cached yet!")
-        return val
+        return asset_data.get_tag_value(tag_name)
 
     def get_properties(self, asset_data):
         raise NotImplementedError
