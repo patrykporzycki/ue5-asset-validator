@@ -1,11 +1,13 @@
 {
   "max_resolution": 2048,
+  "max_bone_influences": 4,
   "allow_autofix": {
     "power_of_two": false,
     "max_resolution": false,
     "mipmaps": true,
     "srgb": true,
-    "compression": true
+    "compression": true,
+    "bone_influences": true
   },
   "prefix_rules": {
     "Texture2D": "T_",
