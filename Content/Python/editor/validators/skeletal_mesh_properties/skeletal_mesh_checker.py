@@ -48,7 +48,6 @@ class BoneInfluencesCheck(Check):
 
         return True
 
-
 SKELETAL_MESH_CHECKS = [
     LODsCheck(),
     BoneInfluencesCheck()

@@ -6,11 +6,19 @@ from editor.validators.naming_convention.naming_convention_checker import NAMING
 from editor.validators.naming_convention.naming_convention_adapter import NamingConventionAdapter
 from editor.validators.skeletal_mesh_properties.skeletal_mesh_adapter import SkeletalMeshAdapter
 from editor.validators.skeletal_mesh_properties.skeletal_mesh_checker import SKELETAL_MESH_CHECKS
+from editor.validators.broken_references.broken_references_checker import BROKEN_REFERENCES_CHECKS
+from editor.validators.broken_references.broken_references_adapter import BrokenReferencesAdapter
 
 
 from core.types import RegistryEntry
 
 VALIDATOR_REGISTRY = {
+    "broken_references": RegistryEntry(
+        name="broken_references",
+        applies_to=["*"],
+        adapter=BrokenReferencesAdapter(),
+        checks=BROKEN_REFERENCES_CHECKS,
+    ),
     "texture_properties": RegistryEntry(
         name="texture_properties",
         applies_to=["Texture2D"],
