@@ -7,6 +7,7 @@ def validate(properties, rules, checks : list[Check]):
             alert = check.check(properties, rules)
             if alert is not None:
                 alerts.append(alert)
-        except Exception:
+        except Exception as e:
+            unreal.log(f"Check {check.alert_id} failed: {e}")
             continue
     return alerts
