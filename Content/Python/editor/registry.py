@@ -11,7 +11,7 @@ from editor.validators.references.references_adapter import ReferencesAdapter
 from editor.validators.niagara_properties.niagara_properties_adapter import NiagaraAdapter
 from editor.validators.niagara_properties.niagara_properties_checker import NIAGARA_CHECKS
 from editor.validators.animation_properties.animation_properties_adapter import AnimationPropertiesAdapter
-
+from editor.validators.material_properties.material_properties_adapter import MaterialPropertiesAdapter
 from core.types import RegistryEntry
 
 VALIDATOR_REGISTRY = {
@@ -57,4 +57,11 @@ VALIDATOR_REGISTRY = {
         adapter=AnimationPropertiesAdapter(),
         checks=[],
     ),
+    "material_properties": RegistryEntry(
+        name="material_properties",
+        applies_to=["Material"],
+        adapter=MaterialPropertiesAdapter(),
+        checks=[],
+    ),
+
 }
