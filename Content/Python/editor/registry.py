@@ -10,6 +10,7 @@ from editor.validators.references.references_checker import REFERENCES_CHECKS
 from editor.validators.references.references_adapter import ReferencesAdapter
 from editor.validators.niagara_properties.niagara_properties_adapter import NiagaraAdapter
 from editor.validators.niagara_properties.niagara_properties_checker import NIAGARA_CHECKS
+from editor.validators.animation_properties.animation_properties_adapter import AnimationPropertiesAdapter
 
 from core.types import RegistryEntry
 
@@ -49,5 +50,11 @@ VALIDATOR_REGISTRY = {
         applies_to=["NiagaraSystem"],
         adapter=NiagaraAdapter(),
         checks=NIAGARA_CHECKS,
-    )
+    ),
+    "animation_properties": RegistryEntry(
+        name="animation_properties",
+        applies_to=["AnimSequence"],
+        adapter=AnimationPropertiesAdapter(),
+        checks=[],
+    ),
 }
