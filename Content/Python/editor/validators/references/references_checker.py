@@ -2,11 +2,6 @@ from __future__ import annotations
 from core.types import Check
 from core.types import Alert, Severity
 
-try:
-    import unreal
-except ImportError:
-    unreal = None
-
 class BrokenReferencesCheck(Check):
     alert_id = "broken_references"
     severity = Severity.ERROR
@@ -23,6 +18,25 @@ class BrokenReferencesCheck(Check):
             )
         return None
 
-BROKEN_REFERENCES_CHECKS = [
-    BrokenReferencesCheck()
+
+class UnusedAssetCheck(Check):
+    alert_id = "unused_asset"
+    severity = Severity.WARNING
+
+    def check(self, props: dict, rules: dict) -> Alert | None:
+
+        if not props['referencers']:
+            return Alert(
+                id=self.alert_id,
+                severity=self.severity,
+                message="Asset is not referenced by any other asset!",
+                current_value=str(len(props['referencers'])),
+                correct_value=None
+            )
+        return None
+
+
+REFERENCES_CHECKS = [
+    BrokenReferencesCheck(),
+    UnusedAssetCheck()
 ]
