@@ -8,7 +8,8 @@ from editor.validators.skeletal_mesh_properties.skeletal_mesh_adapter import Ske
 from editor.validators.skeletal_mesh_properties.skeletal_mesh_checker import SKELETAL_MESH_CHECKS
 from editor.validators.references.references_checker import REFERENCES_CHECKS
 from editor.validators.references.references_adapter import ReferencesAdapter
-
+from editor.validators.niagara_properties.niagara_properties_adapter import NiagaraAdapter
+from editor.validators.niagara_properties.niagara_properties_checker import NIAGARA_CHECKS
 
 from core.types import RegistryEntry
 
@@ -42,5 +43,11 @@ VALIDATOR_REGISTRY = {
         applies_to=["SkeletalMesh"],
         adapter=SkeletalMeshAdapter(),
         checks=SKELETAL_MESH_CHECKS,
+    ),
+    "niagara_properties": RegistryEntry(
+        name="niagara_properties",
+        applies_to=["NiagaraSystem"],
+        adapter=NiagaraAdapter(),
+        checks=NIAGARA_CHECKS,
     )
 }
