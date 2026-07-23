@@ -2,7 +2,9 @@ import unreal
 from core.types import AssetAdapter
 
 class SkeletalMeshAdapter(AssetAdapter):
-    def get_properties(self, asset_data: unreal.AssetData):
+    requires_u_object = True
+
+    def get_properties(self, asset_data: unreal.AssetData, asset=None):
         dimensions = self.get_tag(asset_data, "EstTotalCompressedSize") or 0
         asset_properties = {
             "name": str(asset_data.asset_name),

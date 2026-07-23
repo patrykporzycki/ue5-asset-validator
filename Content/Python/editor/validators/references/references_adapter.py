@@ -2,7 +2,7 @@ import unreal
 from core.types import AssetAdapter
 
 class ReferencesAdapter(AssetAdapter):
-    def get_properties(self, asset_data: unreal.AssetData):
+    def get_properties(self, asset_data: unreal.AssetData, asset = None):
         registry = unreal.AssetRegistryHelpers.get_asset_registry()
         references = registry.get_dependencies(asset_data.package_name, unreal.AssetRegistryDependencyOptions(
             include_hard_package_references=True,

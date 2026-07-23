@@ -2,7 +2,9 @@ import unreal
 from core.types import AssetAdapter
 
 class NiagaraAdapter(AssetAdapter):
-    def get_properties(self, asset_data: unreal.AssetData):
+    requires_u_object = True
+
+    def get_properties(self, asset_data: unreal.AssetData, asset=None):
         fixed_bounds_size = self.get_tag(asset_data, "FixedBoundsSize")
         asset_properties = {
             "name": str(asset_data.asset_name),

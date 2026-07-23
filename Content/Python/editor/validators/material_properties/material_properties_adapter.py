@@ -2,7 +2,9 @@ import unreal
 from core.types import AssetAdapter
 
 class MaterialPropertiesAdapter(AssetAdapter):
-    def get_properties(self, asset_data: unreal.AssetData):
+    requires_u_object = True
+
+    def get_properties(self, asset_data: unreal.AssetData, asset=None):
         asset_properties = {
             "name": str(asset_data.asset_name),
             "blend_mode": str(self.get_tag(asset_data, "BlendMode")),

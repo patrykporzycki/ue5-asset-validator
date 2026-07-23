@@ -7,11 +7,16 @@ class Severity(Enum):
     CRITICAL = "critical"
 
 class AssetAdapter:
+    requires_u_object: bool = False
+
     @staticmethod
     def get_tag(asset_data, tag_name):
         return asset_data.get_tag_value(tag_name)
 
-    def get_properties(self, asset_data):
+    def get_properties(self, asset_data, asset=None):
+        raise NotImplementedError
+
+    def get_u_object_properties(self, asset):
         raise NotImplementedError
 
 @dataclass(frozen=True)

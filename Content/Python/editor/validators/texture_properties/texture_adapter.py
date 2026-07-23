@@ -8,7 +8,7 @@ def _parse_dimensions(dimensions: str):
     return int(parts[0]), int(parts[1])
 
 class TextureAdapter(AssetAdapter):
-    def get_properties(self, asset_data: unreal.AssetData):
+    def get_properties(self, asset_data: unreal.AssetData, asset = None):
         dimensions = _parse_dimensions(self.get_tag(asset_data, "Dimensions"))
         asset_properties = {
             "name": str(asset_data.asset_name),

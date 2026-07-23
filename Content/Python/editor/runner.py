@@ -5,15 +5,35 @@ from core.validator import validate
 
 _MEMORY_BUDGET = 256 * 1024 * 1024
 
-def audit(asset_datas: unreal.AssetData, rules: dict):
+def audit(asset_datas: unreal.AssetData, rules: dict, validators=None, deep=False):
     reports = []
+    loaded_assets = {}
+    accumulated_bytes = 0
+    if validators is not None:
+        active_validators = {}
+        for k, v in VALIDATOR_REGISTRY.items():
+            if k in validators:
+                active_validators[k] = v
+    else:
+        active_validators = VALIDATOR_REGISTRY
     for asset_data in asset_datas:
         try:
             asset_class = str(asset_data.asset_class_path.asset_name)
-            for validator_name, validator in VALIDATOR_REGISTRY.items():
+            just_loaded = False
+            for validator_name, validator in active_validators.items():
+                asset = None
                 try:
                     if asset_class in validator.applies_to or "*" in validator.applies_to:
-                        properties = validator.adapter.get_properties(asset_data)
+                        if validator.adapter.requires_u_object and deep:
+                            path = str(asset_data.package_name)
+                            if path not in loaded_assets:
+                                asset = unreal.EditorAssetLibrary.load_asset(path)
+                                loaded_assets[path] = asset
+                                just_loaded = True
+                            else:
+                                asset = loaded_assets[path]
+
+                        properties = validator.adapter.get_properties(asset_data, asset)
                         alerts = validate(properties, rules, validator.checks)
                         report = Report(asset_data.package_name,
                                         properties["name"],
@@ -21,6 +41,14 @@ def audit(asset_datas: unreal.AssetData, rules: dict):
                                         properties["estimated_size"],
                                         alerts)
                         reports.append(report)
+
+                        if asset and just_loaded:
+                            accumulated_bytes += properties["estimated_size"]
+                            just_loaded = False
+                        if accumulated_bytes > _MEMORY_BUDGET:
+                            unreal.SystemLibrary.collect_garbage()
+                            accumulated_bytes = 0
+
                 except Exception as e:
                     unreal.log_warning(f"Validator {validator_name} failed to audit asset {asset_data.asset_class_path.asset_name}", e)
                     continue
@@ -29,7 +57,7 @@ def audit(asset_datas: unreal.AssetData, rules: dict):
             continue
     return reports
 
-def fix(reports: list, rules: dict):
+def fix(reports: list):
     accumulated_bytes = 0
     fix_results = []
     reports_by_path = {}
@@ -51,26 +79,22 @@ def fix(reports: list, rules: dict):
                     for grouped_report in grouped_reports:
                         for alert in grouped_report.alerts:
                             fixed = False
-                            if rules["allow_autofix"].get(alert.id, False):
-                                for validator_name, validator in VALIDATOR_REGISTRY.items():
-                                    if grouped_report.type in validator.applies_to or "*" in validator.applies_to:
-                                        for check in validator.checks:
-                                            if check.is_fixable and check.alert_id == alert.id:
-                                                try:
-                                                    check.fix(asset, alert)
-                                                    fix_result = FixResult(grouped_report.name, alert.id, "fixed")
-                                                except Exception as e:
-                                                    fix_result = FixResult(grouped_report.name, alert.id, "failed", f"Failed to fix asset. {e}")
-                                                fix_results.append(fix_result)
-                                                fixed = True
-                                                save_fixed = True
-                                                break
-                                    if fixed:
-                                        break
-                                if not fixed:
-                                    fix_result = FixResult(grouped_report.name, alert.id, "skipped")
-                                    fix_results.append(fix_result)
-                            else:
+                            for validator_name, validator in VALIDATOR_REGISTRY.items():
+                                if grouped_report.type in validator.applies_to or "*" in validator.applies_to:
+                                    for check in validator.checks:
+                                        if check.is_fixable and check.alert_id == alert.id:
+                                            try:
+                                                check.fix(asset, alert)
+                                                fix_result = FixResult(grouped_report.name, alert.id, "fixed")
+                                            except Exception as e:
+                                                fix_result = FixResult(grouped_report.name, alert.id, "failed", f"Failed to fix asset. {e}")
+                                            fix_results.append(fix_result)
+                                            fixed = True
+                                            save_fixed = True
+                                            break
+                                if fixed:
+                                    break
+                            if not fixed:
                                 fix_result = FixResult(grouped_report.name, alert.id, "skipped")
                                 fix_results.append(fix_result)
                     if save_fixed:

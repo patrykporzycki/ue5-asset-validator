@@ -41,7 +41,7 @@ def run(config_path = None, asset_paths = None):
 
     unreal.log(f"Checking {len(asset_datas)} assets...")
     reported_assets = audit(asset_datas, rules)
-    fixed_assets = fix(reported_assets, rules)
+    fixed_assets = fix(reported_assets)
 
     for asset in reported_assets:
         for alert in asset.alerts:

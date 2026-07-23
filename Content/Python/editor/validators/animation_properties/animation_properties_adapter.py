@@ -2,7 +2,8 @@ import unreal
 from core.types import AssetAdapter
 
 class AnimationPropertiesAdapter(AssetAdapter):
-    def get_properties(self, asset_data: unreal.AssetData):
+
+    def get_properties(self, asset_data: unreal.AssetData, asset=None):
         fps = float(self.get_tag(asset_data, "Number of Frames") or 1)/float(self.get_tag(asset_data, "SequenceLength") or 1)
         asset_properties = {
             "name": str(asset_data.asset_name),

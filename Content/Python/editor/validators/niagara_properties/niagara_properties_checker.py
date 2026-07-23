@@ -10,7 +10,7 @@ class UnactiveEmmitersCheck(Check):
             return Alert(
                 id=self.alert_id,
                 severity=self.severity,
-                message=f"Asset has unactive emitters! Unactive emitters: {props['emitters'] - props['active_emitters']}",
+                message=f"Asset has inactive emitters! Inactive emitters: {props['emitters'] - props['active_emitters']}",
                 current_value=str(props['active_emitters']),
                 correct_value=str(props['emitters']),
             )
