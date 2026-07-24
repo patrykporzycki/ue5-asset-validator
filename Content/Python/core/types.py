@@ -16,9 +16,6 @@ class AssetAdapter:
     def get_properties(self, asset_data, asset=None):
         raise NotImplementedError
 
-    def get_u_object_properties(self, asset):
-        raise NotImplementedError
-
 @dataclass(frozen=True)
 class Alert:
     id : str
@@ -53,6 +50,7 @@ class Check:
     alert_id: str = ""
     severity: Severity = Severity.WARNING
     is_fixable: bool = False
+    requires_deep: bool = False
 
     def __init_subclass__(cls):
         if cls.alert_id == "":

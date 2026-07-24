@@ -1,13 +1,11 @@
 from core.types import Check
 
-def validate(properties, rules, checks : list[Check]):
+def validate(properties, rules, checks : list[Check], deep=False):
     alerts = []
     for check in checks:
-        try:
-            alert = check.check(properties, rules)
-            if alert is not None:
-                alerts.append(alert)
-        except Exception as e:
-            unreal.log(f"Check {check.alert_id} failed: {e}")
+        if check.requires_deep and not deep:
             continue
+        alert = check.check(properties, rules)
+        if alert is not None:
+            alerts.append(alert)
     return alerts

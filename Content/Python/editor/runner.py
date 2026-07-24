@@ -34,7 +34,8 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None, deep=Fals
                                 asset = loaded_assets[path]
 
                         properties = validator.adapter.get_properties(asset_data, asset)
-                        alerts = validate(properties, rules, validator.checks)
+
+                        alerts = validate(properties, rules, validator.checks, deep)
                         report = Report(asset_data.package_name,
                                         properties["name"],
                                         asset_class,
