@@ -217,7 +217,7 @@ class BoneNamesCheck(Check):
         extra = [bone for bone in mesh_bones if bone not in reference_bones]
         for bone in extra:
             clean = re.sub(r"_\d+$", "", str(bone))
-            if unreal.Name(clean) in reference_bones:
+            if unreal.Name(clean) in reference_bones and unreal.Name(clean) not in mesh_bones:
                 skeleton_modifier.rename_bone(bone, unreal.Name(clean))
 
         skeleton_modifier.commit_skeleton_to_skeletal_mesh()
