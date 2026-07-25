@@ -7,8 +7,9 @@ _MEMORY_BUDGET = 256 * 1024 * 1024
 
 def audit(asset_datas: unreal.AssetData, rules: dict, validators=None, deep=False):
     reports = []
-    loaded_assets = {}
     accumulated_bytes = 0
+    packages_to_unload = []
+
     if validators is not None:
         active_validators = {}
         for k, v in VALIDATOR_REGISTRY.items():
@@ -19,44 +20,60 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None, deep=Fals
     for asset_data in asset_datas:
         try:
             asset_class = str(asset_data.asset_class_path.asset_name)
-            just_loaded = False
+            needs_u_object = False
+            for active_validator in active_validators.values():
+                if asset_class in active_validator.applies_to or "*" in active_validator.applies_to:
+                    if active_validator.adapter.requires_u_object and deep:
+                        needs_u_object = True
+                        break
+
+            asset = None
+            if needs_u_object:
+                path = str(asset_data.package_name)
+                asset = unreal.EditorAssetLibrary.load_asset(path)
+
+            asset_estimated_size = 0
             for validator_name, validator in active_validators.items():
-                asset = None
+                if asset_class not in validator.applies_to and "*" not in validator.applies_to:
+                    continue
                 try:
-                    if asset_class in validator.applies_to or "*" in validator.applies_to:
-                        if validator.adapter.requires_u_object and deep:
-                            path = str(asset_data.package_name)
-                            if path not in loaded_assets:
-                                asset = unreal.EditorAssetLibrary.load_asset(path)
-                                loaded_assets[path] = asset
-                                just_loaded = True
-                            else:
-                                asset = loaded_assets[path]
-
-                        properties = validator.adapter.get_properties(asset_data, asset)
-
-                        alerts = validate(properties, rules, validator.checks, deep)
-                        report = Report(asset_data.package_name,
-                                        properties["name"],
-                                        asset_class,
-                                        properties["estimated_size"],
-                                        alerts)
-                        reports.append(report)
-
-                        if asset and just_loaded:
-                            accumulated_bytes += properties["estimated_size"]
-                            just_loaded = False
-                        if accumulated_bytes > _MEMORY_BUDGET:
-                            unreal.SystemLibrary.collect_garbage()
-                            accumulated_bytes = 0
+                    asset_for_adapter = asset if validator.adapter.requires_u_object else None
+                    properties = validator.adapter.get_properties(asset_data, asset_for_adapter)
+                    asset_estimated_size = properties["estimated_size"]
+                    alerts = validate(properties, rules, validator.checks, deep)
+                    report = Report(asset_data.package_name,
+                                    properties["name"],
+                                    asset_class,
+                                    properties["estimated_size"],
+                                    alerts)
+                    reports.append(report)
 
                 except Exception as e:
                     unreal.log_warning(f"Validator {validator_name} failed to audit asset {asset_data.asset_class_path.asset_name}", e)
                     continue
+
+            if needs_u_object and asset:
+                package = unreal.EditorAssetLibrary.get_package_for_object(asset)
+                packages_to_unload.append(package)
+
+            asset = None
+
+            if needs_u_object:
+                accumulated_bytes += asset_estimated_size
+                if accumulated_bytes > _MEMORY_BUDGET:
+                    unreal.EditorLoadingAndSavingUtils.unload_packages(packages_to_unload)
+                    packages_to_unload.clear()
+                    unreal.SystemLibrary.collect_garbage()
+                    accumulated_bytes = 0
+
         except Exception as e:
             unreal.log_warning(f"Failed to audit asset {asset_data.asset_class_path.asset_name}", e)
             continue
+    if packages_to_unload:
+        unreal.EditorLoadingAndSavingUtils.unload_packages(packages_to_unload)
+        packages_to_unload.clear()
     return reports
+
 
 def fix(reports: list):
     accumulated_bytes = 0
