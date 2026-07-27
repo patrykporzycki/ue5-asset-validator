@@ -8,5 +8,11 @@
 	"CreatedBy": "Patryk Porzycki",
 	"CanContainContent": true,
 	"EnabledByDefault": true,
-	"Modules": []
+	"Modules": [
+        {
+            "Name": "AssetValidatorEditor",
+            "Type": "Editor",
+            "LoadingPhase": "Default"
+        }
+	]
 }
