@@ -1,9 +1,9 @@
 from core.types import Check
 
-def validate(properties, rules, checks : list[Check], deep=False):
+def validate(properties, rules, checks : list[Check]):
     alerts = []
     for check in checks:
-        if check.requires_deep and not deep:
+        if check.requires_deep:
             continue
         alert = check.check(properties, rules)
         if alert is not None:

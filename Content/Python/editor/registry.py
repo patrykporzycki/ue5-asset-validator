@@ -1,11 +1,11 @@
-from editor.validators.texture_properties.texture_checker import TEXTURE_CHECKS
-from editor.validators.texture_properties.texture_adapter import TextureAdapter
-from editor.validators.static_mesh_properties.static_mesh_adapter import StaticMeshAdapter
-from editor.validators.static_mesh_properties.static_mesh_checker import STATIC_MESH_CHECKS
+from editor.validators.texture_properties.texture_properties_checker import TEXTURE_CHECKS
+from editor.validators.texture_properties.texture_properties_adapter import TextureAdapter
+from editor.validators.sm_mesh_properties.sm_mesh_adapter import StaticMeshAdapter
+from editor.validators.sm_mesh_properties.sm_mesh_checker import STATIC_MESH_CHECKS
 from editor.validators.naming_convention.naming_convention_checker import NAMING_CONVENTION_CHECKS
 from editor.validators.naming_convention.naming_convention_adapter import NamingConventionAdapter
-from editor.validators.skeletal_mesh_properties.skeletal_mesh_adapter import SkeletalMeshAdapter
-from editor.validators.skeletal_mesh_properties.skeletal_mesh_checker import SKELETAL_MESH_CHECKS
+from editor.validators.sk_mesh_properties.sk_mesh_properties_adapter import SkeletalMeshAdapter
+from editor.validators.sk_mesh_properties.sk_mesh_properties_checker import SKELETAL_MESH_CHECKS
 from editor.validators.references.references_checker import REFERENCES_CHECKS
 from editor.validators.references.references_adapter import ReferencesAdapter
 from editor.validators.niagara_properties.niagara_properties_adapter import NiagaraAdapter
@@ -27,8 +27,8 @@ VALIDATOR_REGISTRY = {
         adapter=TextureAdapter(),
         checks=TEXTURE_CHECKS,
     ),
-    "static_mesh_properties": RegistryEntry(
-        name="static_mesh_properties",
+    "sm_mesh_properties": RegistryEntry(
+        name="sm_mesh_properties",
         applies_to=["StaticMesh"],
         adapter=StaticMeshAdapter(),
         checks = STATIC_MESH_CHECKS,
@@ -39,8 +39,8 @@ VALIDATOR_REGISTRY = {
         adapter=NamingConventionAdapter(),
         checks=NAMING_CONVENTION_CHECKS,
     ),
-    "skeletal_mesh_properties": RegistryEntry(
-        name="skeletal_mesh_properties",
+    "sk_mesh_properties": RegistryEntry(
+        name="sk_mesh_properties",
         applies_to=["SkeletalMesh"],
         adapter=SkeletalMeshAdapter(),
         checks=SKELETAL_MESH_CHECKS,

@@ -5,7 +5,7 @@ from core.validator import validate
 
 _PACKAGE_BUDGET = 100
 
-def audit(asset_datas: unreal.AssetData, rules: dict, validators=None, deep=False):
+def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
     reports = []
 
     if validators is not None:
@@ -27,7 +27,7 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None, deep=Fals
                 needs_u_object = False
                 for active_validator in active_validators.values():
                     if asset_class in active_validator.applies_to or "*" in active_validator.applies_to:
-                        if active_validator.adapter.requires_u_object and deep:
+                        if active_validator.adapter.requires_u_object:
                             needs_u_object = True
                             break
 
@@ -42,7 +42,7 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None, deep=Fals
                     try:
                         asset_for_adapter = asset if validator.adapter.requires_u_object else None
                         properties = validator.adapter.get_properties(asset_data, asset_for_adapter)
-                        alerts = validate(properties, rules, validator.checks, deep)
+                        alerts = validate(properties, rules, validator.checks)
                         if alerts:
                             report = Report(asset_data.package_name,
                                             properties["name"],
@@ -114,7 +114,7 @@ def fix(reports: list):
                     unreal.EditorAssetLibrary.save_loaded_asset(asset)
 
                 current_packages = unreal.PackageLoaderManager.get_loaded_package_count()
-                if current_packages - base_packages > _PACKAGE_BUDGET:
+                if current_packages - len(base_packages) > _PACKAGE_BUDGET:
                     unreal.PackageLoaderManager.unload_loaded_packages(base_packages)
                     unreal.SystemLibrary.collect_garbage()
 
