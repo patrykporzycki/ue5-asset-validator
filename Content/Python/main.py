@@ -43,20 +43,19 @@ def run(config_path = None, asset_paths = None):
     reported_assets = audit(asset_datas, rules)
     fixed_assets = fix(reported_assets)
 
-    for asset in reported_assets:
-        for alert in asset.alerts:
-            unreal.log(f"{asset.name}: {alert.message}")
-        if not asset.alerts:
-            unreal.log(f"{asset.name}: OK")
+    for report in reported_assets:
+        for source, alerts in report.alerts.items():
+            for alert, _ in alerts:
+                unreal.log(f"[{source}] {report.name}: {alert.message}")
 
     fixed = sum(1 for f in fixed_assets if f.status == "fixed")
     skipped = sum(1 for f in fixed_assets if f.status == "skipped")
     failed = sum(1 for f in fixed_assets if f.status == "failed")
     unreal.log(f"Fix results: {fixed} fixed, {skipped} skipped, {failed} failed")
 
-    for fixed_asset in fixed_assets:
-        if fixed_asset.status == "failed":
-            unreal.log_error(f"  {fixed_asset.name}: [{fixed_asset.alert}] — {fixed_asset.error}")
+    for result in fixed_assets:
+        if result.status == "failed":
+            unreal.log_error(f"  [{result.source}] {result.name}: {result.alert} — {result.error}")
 
 
 

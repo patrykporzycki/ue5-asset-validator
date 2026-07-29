@@ -1,11 +1,11 @@
 from core.types import Check
 
 def validate(properties, rules, checks : list[Check]):
-    alerts = []
+    results = []
     for check in checks:
         if check.requires_deep:
             continue
         alert = check.check(properties, rules)
         if alert is not None:
-            alerts.append(alert)
-    return alerts
+            results.append((alert, check))
+    return results

@@ -13,7 +13,7 @@ class StaticMeshProps(BaseProps):
     nanite: bool = False
 
 
-class SMMeshPropertiesAdapter(AssetAdapter):
+class StaticMeshPropsAdapter(AssetAdapter):
     requires_u_object = True
 
     def get_properties(self, asset_data: unreal.AssetData, asset = None):

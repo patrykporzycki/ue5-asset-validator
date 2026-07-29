@@ -1,6 +1,6 @@
 from editor.validators.texture_properties.texture_properties_checker import TEXTURE_CHECKS
 from editor.validators.texture_properties.texture_properties_adapter import TextureAdapter
-from editor.validators.static_mesh_properties.static_mesh_adapter import SMMeshPropertiesAdapter
+from editor.validators.static_mesh_properties.static_mesh_adapter import StaticMeshPropsAdapter
 from editor.validators.static_mesh_properties.static_mesh_checker import SM_MESH_PROPERTIES_CHECKS
 from editor.validators.naming_convention.naming_convention_checker import NAMING_CONVENTION_CHECKS
 from editor.validators.naming_convention.naming_convention_adapter import NamingConventionAdapter
@@ -30,7 +30,7 @@ VALIDATOR_REGISTRY = {
     "static_mesh_properties": RegistryEntry(
         name="static_mesh_properties",
         applies_to=["StaticMesh"],
-        adapter=SMMeshPropertiesAdapter(),
+        adapter=StaticMeshPropsAdapter(),
         checks = SM_MESH_PROPERTIES_CHECKS,
     ),
     "naming_convention": RegistryEntry(

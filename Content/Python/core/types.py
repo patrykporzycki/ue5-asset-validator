@@ -31,26 +31,12 @@ class Alert:
     correct_value: Any | None = None
 
 @dataclass(frozen=True)
-class Report:
-    path: str
-    name: str
-    type: str
-    alerts: list[Alert]
-    props: object | None = None
-
-@dataclass(frozen=True)
 class FixResult:
     name: str
     alert: str
     status: str
+    source: str = ""
     error: str | None = None
-
-@dataclass(frozen=True)
-class RegistryEntry:
-    name: str
-    applies_to: list[str]
-    adapter: AssetAdapter
-    checks: list
 
 class Check:
     alert_id: str = ""
@@ -65,3 +51,19 @@ class Check:
 
     def fix(self, asset, alert, props) -> bool :
         return False
+
+@dataclass(frozen=True)
+class Report:
+    path: str
+    name: str
+    type: str
+    alerts: dict[str, list[tuple[Alert, Check]]]
+    props: dict
+
+
+@dataclass(frozen=True)
+class RegistryEntry:
+    name: str
+    applies_to: list[str]
+    adapter: AssetAdapter
+    checks: list

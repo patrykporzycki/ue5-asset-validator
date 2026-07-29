@@ -5,9 +5,7 @@ from core.validator import validate
 
 _PACKAGE_BUDGET = 100
 
-def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
-    reports = []
-
+def _select_active_validators(validators = None):
     if validators is not None:
         active_validators = {}
         for k, v in VALIDATOR_REGISTRY.items():
@@ -15,7 +13,11 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
                 active_validators[k] = v
     else:
         active_validators = VALIDATOR_REGISTRY
+    return active_validators
 
+def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
+    reports = []
+    active_validators = _select_active_validators(validators)
     base_packages = unreal.PackageLoaderManager.get_loaded_package_names()
 
     with unreal.ScopedSlowTask(len(asset_datas), "Loading Assets") as slow_task:
@@ -36,6 +38,8 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
                 if needs_u_object:
                     asset = unreal.find_asset(path) or unreal.EditorAssetLibrary.load_asset(str(path))
 
+                all_alerts = {}
+                all_props = {}
                 for validator_name, validator in active_validators.items():
                     if asset_class not in validator.applies_to and "*" not in validator.applies_to:
                         continue
@@ -44,15 +48,14 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
                         properties = validator.adapter.get_properties(asset_data, asset_for_adapter)
                         alerts = validate(properties, rules, validator.checks)
                         if alerts:
-                            report = Report(asset_data.package_name,
-                                            properties.name,
-                                            asset_class,
-                                            alerts,
-                                            props=properties)
-                            reports.append(report)
+                            all_alerts[validator_name] = alerts
+                            all_props[validator_name] = properties
                     except Exception as e:
                         unreal.log_warning(f"Validator {validator_name} failed to audit asset {asset_data.asset_class_path.asset_name} : {e}")
                         continue
+                if all_alerts:
+                    report = Report(path, str(asset_data.asset_name), asset_class, all_alerts, all_props)
+                    reports.append(report)
 
                 if needs_u_object:
                     current_packages = unreal.PackageLoaderManager.get_loaded_package_count()
@@ -71,45 +74,31 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
 
 def fix(reports: list):
     fix_results = []
-    reports_by_path = {}
-    for report in reports:
-        if report.path in reports_by_path:
-            reports_by_path[report.path].append(report)
-        else:
-            reports_by_path[report.path] = [report]
 
     base_packages = unreal.PackageLoaderManager.get_loaded_package_names()
 
-    with unreal.ScopedSlowTask(len(reports_by_path), "Fixing Assets") as slow_task:
+    with unreal.ScopedSlowTask(len(reports), "Fixing Assets") as slow_task:
         slow_task.make_dialog(can_cancel=True)
-        for path, grouped_reports in reports_by_path.items():
+        for report in reports:
             if slow_task.should_cancel():
                 break
             try:
-                slow_task.enter_progress_frame(1, f"Fixing: {path}")
-                asset = unreal.EditorAssetLibrary.load_asset(str(path))
+                slow_task.enter_progress_frame(1, f"Fixing: {report.path}")
+                asset = unreal.EditorAssetLibrary.load_asset(str(report.path))
                 save_fixed = False
-                for grouped_report in grouped_reports:
-                    for alert in grouped_report.alerts:
-                        fixed = False
-                        for validator_name, validator in VALIDATOR_REGISTRY.items():
-                            if grouped_report.type in validator.applies_to or "*" in validator.applies_to:
-                                for check in validator.checks:
-                                    if check.is_fixable and check.alert_id == alert.id:
-                                        try:
-                                            check.fix(asset, alert, grouped_report.props)
-                                            fix_result = FixResult(grouped_report.name, alert.id, "fixed")
-                                        except Exception as e:
-                                            fix_result = FixResult(grouped_report.name, alert.id, "failed", f"Failed to fix asset. {e}")
-                                        fix_results.append(fix_result)
-                                        fixed = True
-                                        save_fixed = True
-                                        break
-                            if fixed:
-                                break
-                        if not fixed:
-                            fix_result = FixResult(grouped_report.name, alert.id, "skipped")
-                            fix_results.append(fix_result)
+                for source, results in report.alerts.items():
+                    for alert, check in results:
+                        if check.is_fixable:
+                            try:
+                                check.fix(asset, alert, report.props.get(source))
+                                fix_result = FixResult(report.name, alert.id, "fixed", source)
+                            except Exception as e:
+                                fix_result = FixResult(report.name, alert.id, "failed", source, f"Failed to fix asset. {e}")
+                            save_fixed = True
+                        else:
+                            fix_result = FixResult(report.name, alert.id, "skipped", source)
+                        fix_results.append(fix_result)
+
                 if save_fixed:
                     unreal.EditorAssetLibrary.save_loaded_asset(asset)
 
@@ -120,9 +109,9 @@ def fix(reports: list):
 
             except Exception as e:
                 unreal.log_error("Failed to fix asset", e)
-                for report in grouped_reports:
-                    for alert in report.alerts:
-                        fix_result = FixResult(report.name, alert.id, "failed", str(e))
+                for source, results in report.alerts.items():
+                    for alert, check in results:
+                        fix_result = FixResult(report.name, alert.id, "failed", source, str(e))
                         fix_results.append(fix_result)
 
     unreal.PackageLoaderManager.unload_loaded_packages(base_packages)
