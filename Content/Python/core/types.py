@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
+
 
 class Severity(Enum):
     WARNING = "warning"
@@ -16,21 +18,25 @@ class AssetAdapter:
     def get_properties(self, asset_data, asset=None):
         raise NotImplementedError
 
+@dataclass
+class BaseProps:
+    name: str
+
 @dataclass(frozen=True)
 class Alert:
     id : str
     severity: Severity
     message: str
     current_value: str
-    correct_value: str | bool | int | None
+    correct_value: Any | None = None
 
 @dataclass(frozen=True)
 class Report:
     path: str
     name: str
     type: str
-    estimated_size: int
     alerts: list[Alert]
+    props: object | None = None
 
 @dataclass(frozen=True)
 class FixResult:
@@ -57,13 +63,5 @@ class Check:
             raise TypeError("Alert ID not provided!")
     def check(self, properties, rules) -> Alert : raise NotImplementedError
 
-    def fix(self, properties, rules) -> bool :
+    def fix(self, asset, alert, props) -> bool :
         return False
-
-
-
-
-
-
-
-

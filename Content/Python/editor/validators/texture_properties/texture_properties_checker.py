@@ -29,14 +29,14 @@ class PowerOfTwoCheck(Check):
     alert_id = "power_of_two"
     severity = Severity.WARNING
 
-    def check(self, props: dict, rules: dict) -> Alert | None:
-        if _is_power_of_two(props['resolution_x']) and _is_power_of_two(props['resolution_y']):
+    def check(self, props, rules) -> Alert | None:
+        if _is_power_of_two(props.resolution_x) and _is_power_of_two(props.resolution_y):
             return None
         return Alert(
             id=self.alert_id,
             severity=self.severity,
-            message=f"Resolution {props['resolution_x']}x{props['resolution_y']} is not a power of two!",
-            current_value=f"{props['resolution_x']}x{props['resolution_y']}",
+            message=f"Resolution {props.resolution_x}x{props.resolution_y} is not a power of two!",
+            current_value=f"{props.resolution_x}x{props.resolution_y}",
             correct_value=None
         )
 
@@ -45,19 +45,19 @@ class MaxResolutionCheck(Check):
     severity = Severity.WARNING
     is_fixable = True
 
-    def check(self, props: dict, rules: dict) -> Alert | None:
-        current_resolution = max(props['resolution_x'], props['resolution_y'])
+    def check(self, props, rules) -> Alert | None:
+        current_resolution = max(props.resolution_x, props.resolution_y)
         if current_resolution > rules['max_resolution']:
             return Alert(
                 id=self.alert_id,
                 severity=self.severity,
-                message=f"Resolution {props['resolution_x']}x{props['resolution_y']} exceeds {rules['max_resolution']}!",
+                message=f"Resolution {props.resolution_x}x{props.resolution_y} exceeds {rules['max_resolution']}!",
                 current_value=str(current_resolution),
                 correct_value=rules['max_resolution']
             )
         return None
 
-    def fix(self, asset, alert):
+    def fix(self, asset, alert, props = None):
         return _fix_property(asset, 'max_texture_size', alert.correct_value, 'max resolution')
 
 class MipmapCheck(Check):
@@ -65,8 +65,8 @@ class MipmapCheck(Check):
     severity = Severity.WARNING
     is_fixable = True
 
-    def check(self, props: dict, rules: dict) -> Alert | None:
-        if props['mipmaps'] == "TMGS_NO_MIPMAPS":
+    def check(self, props, rules) -> Alert | None:
+        if props.mipmaps == "TMGS_NO_MIPMAPS":
             return Alert(
                 id=self.alert_id,
                 severity=self.severity,
@@ -75,7 +75,7 @@ class MipmapCheck(Check):
                 correct_value="TMGS_FROM_TEXTURE_GROUP"
             )
         return None
-    def fix(self, asset, alert):
+    def fix(self, asset, alert, props = None):
         return _fix_property(asset, "mip_gen_settings", unreal.TextureMipGenSettings.TMGS_FROM_TEXTURE_GROUP,"mipmaps")
 
 
@@ -85,20 +85,20 @@ class SrgbCheck(Check):
     severity = Severity.WARNING
     is_fixable = True
 
-    def check(self, props: dict, rules: dict) -> Alert | None:
-        rule = _find_rule(props['name'], rules['suffix_rules'])
+    def check(self, props, rules) -> Alert | None:
+        rule = _find_rule(props.name, rules['suffix_rules'])
         if rule is None:
             return None
-        if props['srgb'] != rule['srgb']:
+        if props.srgb != rule['srgb']:
             return Alert(
                 id=self.alert_id,
                 severity=self.severity,
-                message=f"sRGB setting is set to {props['srgb']}, but texture name suggests {rule['srgb']}",
-                current_value=str(props['srgb']),
+                message=f"sRGB setting is set to {props.srgb}, but texture name suggests {rule['srgb']}",
+                current_value=str(props.srgb),
                 correct_value=rule['srgb'],
             )
         return None
-    def fix(self, asset, alert):
+    def fix(self, asset, alert, props = None):
         return _fix_property(asset, "srgb", alert.correct_value, "sRGB")
 
 class CompressionCheck(Check):
@@ -106,20 +106,20 @@ class CompressionCheck(Check):
     severity = Severity.WARNING
     is_fixable = True
 
-    def check(self, props: dict, rules: dict) -> Alert | None:
-        rule = _find_rule(props['name'], rules['suffix_rules'])
+    def check(self, props, rules) -> Alert | None:
+        rule = _find_rule(props.name, rules['suffix_rules'])
         if rule is None:
             return None
-        if props['compression'] not in rule['compression']:
+        if props.compression not in rule['compression']:
             return Alert(
                 id=self.alert_id,
                 severity=self.severity,
-                message=f"Compression setting is set to {props['compression']}, but texture name suggests {rule['compression']}",
-                current_value=props['compression'],
+                message=f"Compression setting is set to {props.compression}, but texture name suggests {rule['compression']}",
+                current_value=props.compression,
                 correct_value=rule['compression'][0],
             )
         return None
-    def fix(self, asset, alert):
+    def fix(self, asset, alert, props = None):
         return _fix_property(asset, "compression_settings", getattr(unreal.TextureCompressionSettings, alert.correct_value), "compression")
 
 TEXTURE_CHECKS = [

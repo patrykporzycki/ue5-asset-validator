@@ -1,8 +1,19 @@
+from dataclasses import dataclass, field
+
 import unreal
-from core.types import AssetAdapter
+from core.types import AssetAdapter, BaseProps
+
+
+@dataclass
+class ReferencesProps(BaseProps):
+    asset_class: str = ""
+    package_name: str = ""
+    broken_references: list[str] = field(default_factory=list)
+    referencers: list = field(default_factory=list)
+
 
 class ReferencesAdapter(AssetAdapter):
-    def get_properties(self, asset_data: unreal.AssetData, asset = None):
+    def get_properties(self, asset_data: unreal.AssetData, asset=None):
         registry = unreal.AssetRegistryHelpers.get_asset_registry()
         references = registry.get_dependencies(asset_data.package_name, unreal.AssetRegistryDependencyOptions(
             include_hard_package_references=True,
@@ -15,12 +26,10 @@ class ReferencesAdapter(AssetAdapter):
             include_game_package_references=True
         ))
 
-        asset_properties = {
-            "name": str(asset_data.asset_name),
-            "asset_class": str(asset_data.asset_class_path.asset_name),
-            "package_name": str(asset_data.package_name),
-            "broken_references": broken_references,
-            "referencers": referencers,
-            "estimated_size": 0
-        }
-        return asset_properties
+        return ReferencesProps(
+            name=str(asset_data.asset_name),
+            asset_class=str(asset_data.asset_class_path.asset_name),
+            package_name=str(asset_data.package_name),
+            broken_references=broken_references,
+            referencers=referencers,
+        )

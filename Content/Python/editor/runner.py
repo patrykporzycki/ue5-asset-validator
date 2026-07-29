@@ -45,10 +45,10 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
                         alerts = validate(properties, rules, validator.checks)
                         if alerts:
                             report = Report(asset_data.package_name,
-                                            properties["name"],
+                                            properties.name,
                                             asset_class,
-                                            properties["estimated_size"],
-                                            alerts)
+                                            alerts,
+                                            props=properties)
                             reports.append(report)
                     except Exception as e:
                         unreal.log_warning(f"Validator {validator_name} failed to audit asset {asset_data.asset_class_path.asset_name} : {e}")
@@ -97,7 +97,7 @@ def fix(reports: list):
                                 for check in validator.checks:
                                     if check.is_fixable and check.alert_id == alert.id:
                                         try:
-                                            check.fix(asset, alert)
+                                            check.fix(asset, alert, grouped_report.props)
                                             fix_result = FixResult(grouped_report.name, alert.id, "fixed")
                                         except Exception as e:
                                             fix_result = FixResult(grouped_report.name, alert.id, "failed", f"Failed to fix asset. {e}")
