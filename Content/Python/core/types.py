@@ -59,6 +59,7 @@ class Report:
     type: str
     alerts: dict[str, list[tuple[Alert, Check]]]
     props: dict
+    timestamp: float
 
 
 @dataclass(frozen=True)

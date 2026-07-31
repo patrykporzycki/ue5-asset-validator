@@ -1,4 +1,5 @@
 import unreal
+import os
 from core.types import Report, FixResult
 from editor.registry import VALIDATOR_REGISTRY
 from core.validator import validate
@@ -14,6 +15,13 @@ def _select_active_validators(validators = None):
     else:
         active_validators = VALIDATOR_REGISTRY
     return active_validators
+
+def _file_timestamp(path):
+    try:
+        file_path = unreal.PackageTools.package_name_to_filename(path, ".uasset")
+        return os.path.getmtime(file_path)
+    except (FileNotFoundError, OSError):
+        return None
 
 def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
     reports = []
@@ -54,7 +62,7 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
                         unreal.log_warning(f"Validator {validator_name} failed to audit asset {asset_data.asset_class_path.asset_name} : {e}")
                         continue
                 if all_alerts:
-                    report = Report(path, str(asset_data.asset_name), asset_class, all_alerts, all_props)
+                    report = Report(path, str(asset_data.asset_name), asset_class, all_alerts, all_props, _file_timestamp(path))
                     reports.append(report)
 
                 if needs_u_object:
@@ -71,10 +79,8 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
     unreal.SystemLibrary.collect_garbage()
     return reports
 
-
 def fix(reports: list):
     fix_results = []
-
     base_packages = unreal.PackageLoaderManager.get_loaded_package_names()
 
     with unreal.ScopedSlowTask(len(reports), "Fixing Assets") as slow_task:
@@ -84,6 +90,19 @@ def fix(reports: list):
                 break
             try:
                 slow_task.enter_progress_frame(1, f"Fixing: {report.path}")
+                timestamp = _file_timestamp(report.path)
+                if timestamp is None:
+                    for source, results in report.alerts.items():
+                        for alert, check in results:
+                            fix_result = FixResult(report.name, alert.id, "failed", source, "Failed to load asset!")
+                            fix_results.append(fix_result)
+                    continue
+                if timestamp > report.timestamp:
+                    for source, results in report.alerts.items():
+                        for alert, check in results:
+                            fix_result = FixResult(report.name, alert.id, "skipped", source, "Skipped, asset changed since last scan!")
+                            fix_results.append(fix_result)
+                    continue
                 asset = unreal.EditorAssetLibrary.load_asset(str(report.path))
                 save_fixed = False
                 for source, results in report.alerts.items():
