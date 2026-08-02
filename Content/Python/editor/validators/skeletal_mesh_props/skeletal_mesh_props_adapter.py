@@ -41,24 +41,30 @@ def _get_build_settings(asset, build_property):
             return True
     return None
 
-
 def _get_clothing_asset_count(asset):
     clothing_asset_count = len(asset.get_editor_property("mesh_clothing_assets"))
     return clothing_asset_count
 
+def _get_mesh_bones_hierarchy(asset) -> dict[str, str | None]:
+    modifier = unreal.SkeletonModifier()
+    if not modifier.set_skeletal_mesh(asset):
+        return {}
+    parents = {}
+    for bone in modifier.get_all_bone_names():
+        bone_str = str(bone)
+        parent = modifier.get_parent_name(bone_str)
+        parents[bone_str] = str(parent) if parent and str(parent) != "None" else None
+    return parents
 
-def _get_reference_bones(asset) -> list[str]:
-    skeleton = asset.get_editor_property("skeleton")
-    if not skeleton:
-        return []
-    return [str(bone) for bone in skeleton.get_reference_pose().get_bone_names()]
+def _get_reference_bones_hierarchy(asset) -> dict[str, str | None]:
+    bone_names = [bone for bone in unreal.SkeletonReferenceHelper.get_skeleton_bone_names(asset)]
+    parent_indices = list(unreal.SkeletonReferenceHelper.get_reference_skeleton_indices(asset))
 
-
-def _get_mesh_bones(asset) -> list[str]:
-    SkeletonModifier = unreal.SkeletonModifier()
-    SkeletonModifier.set_skeletal_mesh(asset)
-    return [str(bone) for bone in SkeletonModifier.get_all_bone_names()]
-
+    parents = {}
+    for i, name in enumerate(bone_names):
+        index = parent_indices[i]
+        parents[name] = bone_names[index] if index >= 0 else None
+    return parents
 
 @dataclass
 class SkeletalMeshProps(BaseProps):
@@ -76,8 +82,8 @@ class SkeletalMeshProps(BaseProps):
     mikk_t_space: bool | None = None
     materials: list | None = None
     slot_section_usage: dict[int, set[int]] | None = None
-    mesh_bones: list[str] | None = None
-    reference_bones: list[str] | None = None
+    mesh_bones_hierarchy: dict[str, str | None] | None = None
+    reference_bones_hierarchy: dict[str, str | None] | None = None
 
 
 class SkeletalMeshPropsAdapter(AssetAdapter):
@@ -100,6 +106,6 @@ class SkeletalMeshPropsAdapter(AssetAdapter):
             props.recompute_tangents = _get_build_settings(asset, "recompute_tangents")
             props.mikk_t_space = _get_mikk_t_space(asset)
             props.materials, props.slot_section_usage = _get_materials_properties(asset)
-            props.reference_bones = _get_reference_bones(asset)
-            props.mesh_bones = _get_mesh_bones(asset)
+            props.mesh_bones_hierarchy = _get_mesh_bones_hierarchy(asset)
+            props.reference_bones_hierarchy = _get_reference_bones_hierarchy(asset)
         return props

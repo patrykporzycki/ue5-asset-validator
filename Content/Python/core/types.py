@@ -27,7 +27,7 @@ class Alert:
     id : str
     severity: Severity
     message: str
-    current_value: str
+    current_value: Any
     correct_value: Any | None = None
 
 @dataclass(frozen=True)
