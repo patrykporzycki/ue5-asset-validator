@@ -16,35 +16,31 @@ def _fix_build_setting(asset, property_name, value):
         SkeletalMeshEditorSubsystem.set_lod_build_settings(asset, i, build_settings)
 
 class LODsCheck(Check):
-    alert_id = "lods"
-    severity = Severity.WARNING
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         if props.lods == 1:
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
+            return [Alert(
+                id="lods",
+                severity=Severity.WARNING,
                 message="LODs are not set!",
                 current_value=str(props.lods),
-            )
-        return None
+            )]
+        return []
 
 
 class BoneInfluencesCheck(Check):
-    alert_id = "bone_influences"
-    severity = Severity.WARNING
-    is_fixable = True
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         if props.max_bone_influences > rules["max_bone_influences"]:
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
+            return [Alert(
+                id="bone_influences",
+                severity=Severity.WARNING,
                 message=f"Max bone influence is bigger than {rules['max_bone_influences']}!",
                 current_value=str(props.max_bone_influences),
                 correct_value=rules["max_bone_influences"],
-            )
-        return None
+                is_fixable=True,
+            )]
+        return []
 
     def fix(self, asset, alert, props):
         SkinWeightModifier = unreal.SkinWeightModifier()
@@ -57,20 +53,18 @@ class BoneInfluencesCheck(Check):
 
 
 class ClothPhysicsCheck(Check):
-    alert_id = "cloth_physics"
-    severity = Severity.WARNING
-    is_fixable = True
     requires_deep = True
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         if props.clothing_assets_count > 0 and props.physics_asset == "None":
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
+            return [Alert(
+                id="cloth_physics",
+                severity=Severity.WARNING,
                 message="Clothing assets are not set!",
                 current_value=props.physics_asset,
-            )
-        return None
+                is_fixable=True,
+            )]
+        return []
 
     def fix(self, asset, alert, props):
         SkeletalMeshEditorSubsystem = unreal.get_editor_subsystem(unreal.SkeletalMeshEditorSubsystem)
@@ -83,21 +77,19 @@ class ClothPhysicsCheck(Check):
 
 
 class RecomputeNormalsCheck(Check):
-    alert_id = "recompute_normals"
-    severity = Severity.WARNING
-    is_fixable = True
     requires_deep = True
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         if props.recompute_normals:
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
+            return [Alert(
+                id="recompute_normals",
+                severity=Severity.WARNING,
                 message="Recompute Normals is enabled in build settings!",
                 current_value=str(props.recompute_normals),
                 correct_value=False,
-            )
-        return None
+                is_fixable=True,
+            )]
+        return []
 
     def fix(self, asset, alert, props):
         _fix_build_setting(asset, "recompute_normals", alert.correct_value)
@@ -106,21 +98,19 @@ class RecomputeNormalsCheck(Check):
 
 
 class RecomputeTangentsCheck(Check):
-    alert_id = "recompute_tangents"
-    severity = Severity.WARNING
-    is_fixable = True
     requires_deep = True
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         if props.recompute_tangents:
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
+            return [Alert(
+                id="recompute_tangents",
+                severity=Severity.WARNING,
                 message="Recompute Tangents is enabled in build settings!",
                 current_value=str(props.recompute_tangents),
                 correct_value=False,
-            )
-        return None
+                is_fixable=True,
+            )]
+        return []
 
     def fix(self, asset, alert, props):
         _fix_build_setting(asset, "recompute_tangents", alert.correct_value)
@@ -129,21 +119,19 @@ class RecomputeTangentsCheck(Check):
 
 
 class UseMikkTSpace(Check):
-    alert_id = "mikk_t_space"
-    severity = Severity.WARNING
-    is_fixable = True
     requires_deep = True
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         if not props.mikk_t_space:
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
+            return [Alert(
+                id="mikk_t_space",
+                severity=Severity.WARNING,
                 message="Use mikk_t_space is disabled in build settings!",
                 current_value=str(props.mikk_t_space),
                 correct_value=True,
-            )
-        return None
+                is_fixable=True,
+            )]
+        return []
 
     def fix(self, asset, alert, props):
         _fix_build_setting(asset, "use_mikk_t_space", alert.correct_value)
@@ -152,24 +140,22 @@ class UseMikkTSpace(Check):
 
 
 class UnusedMaterialSlotsCheck(Check):
-    alert_id = "unused_material_slots"
-    severity = Severity.WARNING
-    is_fixable = True
     requires_deep = True
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         unused = [
             material for index, material in enumerate(props.materials)
             if index not in props.slot_section_usage
         ]
         if not unused:
-            return None
-        return Alert(
-            id=self.alert_id,
-            severity=self.severity,
+            return []
+        return [Alert(
+            id="unused_material_slots",
+            severity=Severity.WARNING,
             message=f"Unused materials slots: {len(unused)}!",
             current_value=str(len(unused)),
-        )
+            is_fixable=True,
+        )]
 
     def fix(self, asset, alert, props):
         materials = asset.get_editor_property("materials")
@@ -220,28 +206,42 @@ def _categorize_extra_bones(props):
 
     return fixable, hierarchy_mismatch, not_in_ref
 
-class BoneNamesCheck(Check):
-    alert_id = "bones_names"
-    severity = Severity.WARNING
-    is_fixable = True
+class BoneValidationCheck(Check):
     requires_deep = True
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         fixable, hierarchy_mismatch, not_in_ref = _categorize_extra_bones(props)
+        alerts = []
         if fixable:
             bones, clean_bones = zip(*fixable)
-            bones = list(bones)
-            clean_bones = list(clean_bones)
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
-                message=f"Bones with invalid names: {bones}!",
-                current_value=bones,
-                correct_value=clean_bones,
-            )
-        return None
+            alerts.append(Alert(
+                id="bones_names",
+                severity=Severity.WARNING,
+                message=f"Bones with invalid names: {list(bones)}!",
+                current_value=list(bones),
+                correct_value=list(clean_bones),
+                is_fixable=True,
+            ))
+        if hierarchy_mismatch:
+            bones, _ = zip(*hierarchy_mismatch)
+            alerts.append(Alert(
+                id="bones_hierarchy_mismatch",
+                severity=Severity.WARNING,
+                message=f"Bones with wrong hierarchy: {list(bones)}!",
+                current_value=list(bones),
+            ))
+        if not_in_ref:
+            alerts.append(Alert(
+                id="bones_not_in_reference",
+                severity=Severity.WARNING,
+                message=f"Extra bones not in reference skeleton: {not_in_ref}!",
+                current_value=not_in_ref,
+            ))
+        return alerts
 
     def fix(self, asset, alert, props):
+        if alert.id != "bones_names":
+            return False
         skeleton_modifier = unreal.SkeletonModifier()
         if not skeleton_modifier.set_skeletal_mesh(asset):
             raise RuntimeError("Failed to load skeletal mesh for bone renaming!")
@@ -252,45 +252,6 @@ class BoneNamesCheck(Check):
         return True
 
 
-class BoneHierarchyMismatchCheck(Check):
-    alert_id = "bones_hierarchy_mismatch"
-    severity = Severity.WARNING
-    is_fixable = False
-    requires_deep = True
-
-    def check(self, props, rules) -> Alert | None:
-        fixable, hierarchy_mismatch, not_in_ref = _categorize_extra_bones(props)
-        if hierarchy_mismatch:
-            bones, clean_bones = zip(*hierarchy_mismatch)
-            bones = list(bones)
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
-                message=f"Bones with wrong hierarchy: {bones}!",
-                current_value=bones,
-                correct_value=None,
-            )
-        return None
-
-
-class BoneNotInReferenceCheck(Check):
-    alert_id = "bones_not_in_reference"
-    severity = Severity.WARNING
-    is_fixable = False
-    requires_deep = True
-
-    def check(self, props, rules) -> Alert | None:
-        fixable, hierarchy_mismatch, not_in_ref = _categorize_extra_bones(props)
-        if not_in_ref:
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
-                message=f"Extra bones not in reference skeleton: {not_in_ref}!",
-                current_value=not_in_ref,
-                correct_value=None,
-            )
-        return None
-
 SKELETAL_MESH_PROPS_CHECKS = [
     LODsCheck(),
     BoneInfluencesCheck(),
@@ -299,7 +260,5 @@ SKELETAL_MESH_PROPS_CHECKS = [
     RecomputeTangentsCheck(),
     UseMikkTSpace(),
     UnusedMaterialSlotsCheck(),
-    BoneNamesCheck(),
-    BoneHierarchyMismatchCheck(),
-    BoneNotInReferenceCheck(),
+    BoneValidationCheck(),
 ]

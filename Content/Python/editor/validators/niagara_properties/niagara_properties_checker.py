@@ -2,19 +2,17 @@ from core.types import Check
 from core.types import Alert, Severity
 
 class UnactiveEmmitersCheck(Check):
-    alert_id = "unactive_emmiters"
-    severity = Severity.WARNING
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         if props.emitters > props.active_emitters:
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
+            return [Alert(
+                id="unactive_emmiters",
+                severity=Severity.WARNING,
                 message=f"Asset has inactive emitters! Inactive emitters: {props.emitters - props.active_emitters}",
                 current_value=str(props.active_emitters),
                 correct_value=str(props.emitters),
-            )
-        return None
+            )]
+        return []
 
 NIAGARA_CHECKS = [
     UnactiveEmmitersCheck()

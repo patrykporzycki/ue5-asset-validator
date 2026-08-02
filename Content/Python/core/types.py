@@ -4,9 +4,9 @@ from typing import Any
 
 
 class Severity(Enum):
+    INFO = "info"
     WARNING = "warning"
     ERROR = "error"
-    CRITICAL = "critical"
 
 class AssetAdapter:
     requires_u_object: bool = False
@@ -29,6 +29,7 @@ class Alert:
     message: str
     current_value: Any
     correct_value: Any | None = None
+    is_fixable: bool = False
 
 @dataclass(frozen=True)
 class FixResult:
@@ -38,18 +39,21 @@ class FixResult:
     source: str = ""
     error: str | None = None
 
+@dataclass(frozen=True)
+class FixOption:
+    key: str
+    label: str
+    default: Any
+    choices: tuple | None = None
+
 class Check:
-    alert_id: str = ""
-    severity: Severity = Severity.WARNING
-    is_fixable: bool = False
     requires_deep: bool = False
+    fix_options: list = []
 
-    def __init_subclass__(cls):
-        if cls.alert_id == "":
-            raise TypeError("Alert ID not provided!")
-    def check(self, properties, rules) -> Alert : raise NotImplementedError
+    def check(self, properties, rules) -> list[Alert]:
+        raise NotImplementedError
 
-    def fix(self, asset, alert, props) -> bool :
+    def fix(self, asset, alert, props=None) -> bool:
         return False
 
 @dataclass(frozen=True)
@@ -60,7 +64,6 @@ class Report:
     alerts: dict[str, list[tuple[Alert, Check]]]
     props: dict
     timestamp: float
-
 
 @dataclass(frozen=True)
 class RegistryEntry:

@@ -107,7 +107,7 @@ def fix(reports: list):
                 save_fixed = False
                 for source, results in report.alerts.items():
                     for alert, check in results:
-                        if check.is_fixable:
+                        if alert.is_fixable:
                             try:
                                 check.fix(asset, alert, report.props.get(source))
                                 fix_result = FixResult(report.name, alert.id, "fixed", source)
