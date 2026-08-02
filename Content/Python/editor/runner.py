@@ -111,9 +111,9 @@ def fix(reports: list):
                             try:
                                 check.fix(asset, alert, report.props.get(source))
                                 fix_result = FixResult(report.name, alert.id, "fixed", source)
+                                save_fixed = True
                             except Exception as e:
                                 fix_result = FixResult(report.name, alert.id, "failed", source, f"Failed to fix asset. {e}")
-                            save_fixed = True
                         else:
                             fix_result = FixResult(report.name, alert.id, "skipped", source)
                         fix_results.append(fix_result)
