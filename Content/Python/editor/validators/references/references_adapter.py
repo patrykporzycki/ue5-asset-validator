@@ -17,7 +17,9 @@ class ReferencesAdapter(AssetAdapter):
         registry = unreal.AssetRegistryHelpers.get_asset_registry()
         references = registry.get_dependencies(asset_data.package_name, unreal.AssetRegistryDependencyOptions(
             include_hard_package_references=True,
-            include_game_package_references=True
+            include_game_package_references=True,
+            include_soft_package_references = True,
+            include_searchable_names = True,
         ))
         broken_references = [str(r) for r in references if str(r).startswith("/Game/") and not unreal.EditorAssetLibrary.does_asset_exist(str(r))]
 
