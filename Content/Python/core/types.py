@@ -7,6 +7,7 @@ class Severity(Enum):
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
+    CRITICAL = "critical"
 
 class AssetAdapter:
     requires_u_object: bool = False
@@ -48,13 +49,16 @@ class FixOption:
 
 class Check:
     requires_deep: bool = False
-    fix_options: list = []
+    fix_options: list[FixOption] = []
 
     def check(self, properties, rules) -> list[Alert]:
         raise NotImplementedError
 
-    def fix(self, asset, alert, props=None, ) -> bool:
+    def fix(self, asset, alert, props=None, options:dict|None=None) -> bool:
         return False
+
+    def get_fix_options(self, alert_id, props, rules) -> list[FixOption]:
+        return self.fix_options
 
 @dataclass(frozen=True)
 class Report:

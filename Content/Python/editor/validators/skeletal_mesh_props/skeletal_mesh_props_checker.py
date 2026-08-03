@@ -42,7 +42,7 @@ class BoneInfluencesCheck(Check):
             )]
         return []
 
-    def fix(self, asset, alert, props):
+    def fix(self, asset, alert, props=None, options=None):
         SkinWeightModifier = unreal.SkinWeightModifier()
         if not SkinWeightModifier.set_skeletal_mesh(asset):
             raise RuntimeError("Failed to load skeletal mesh for weight editing")
@@ -66,7 +66,7 @@ class ClothPhysicsCheck(Check):
             )]
         return []
 
-    def fix(self, asset, alert, props):
+    def fix(self, asset, alert, props=None, options=None):
         SkeletalMeshEditorSubsystem = unreal.get_editor_subsystem(unreal.SkeletalMeshEditorSubsystem)
         physics_asset = SkeletalMeshEditorSubsystem.create_physics_asset(asset, set_to_mesh=True, lod_index=0)
         if not physics_asset:
@@ -91,7 +91,7 @@ class RecomputeNormalsCheck(Check):
             )]
         return []
 
-    def fix(self, asset, alert, props):
+    def fix(self, asset, alert, props=None, options=None):
         _fix_build_setting(asset, "recompute_normals", alert.correct_value)
         unreal.log(f"Set recompute_normals false for asset {asset.get_fname()}")
         return True
@@ -112,7 +112,7 @@ class RecomputeTangentsCheck(Check):
             )]
         return []
 
-    def fix(self, asset, alert, props):
+    def fix(self, asset, alert, props=None, options=None):
         _fix_build_setting(asset, "recompute_tangents", alert.correct_value)
         unreal.log(f"Set recompute_tangents false for asset {asset.get_fname()}")
         return True
@@ -133,7 +133,7 @@ class UseMikkTSpace(Check):
             )]
         return []
 
-    def fix(self, asset, alert, props):
+    def fix(self, asset, alert, props=None, options=None):
         _fix_build_setting(asset, "use_mikk_t_space", alert.correct_value)
         unreal.log(f"Set use_mikk_t_space true for asset {asset.get_fname()}")
         return True
@@ -157,7 +157,7 @@ class UnusedMaterialSlotsCheck(Check):
             is_fixable=True,
         )]
 
-    def fix(self, asset, alert, props):
+    def fix(self, asset, alert, props=None, options=None):
         materials = asset.get_editor_property("materials")
         used_indices = set(props.slot_section_usage.keys())
         new_materials = [material for index, material in enumerate(materials) if index in used_indices]
@@ -239,7 +239,7 @@ class BoneValidationCheck(Check):
             ))
         return alerts
 
-    def fix(self, asset, alert, props):
+    def fix(self, asset, alert, props=None, options=None):
         if alert.id != "bones_names":
             return False
         skeleton_modifier = unreal.SkeletonModifier()

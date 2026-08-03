@@ -3,6 +3,19 @@ from dataclasses import dataclass
 import unreal
 from core.types import AssetAdapter, BaseProps
 
+def _get_mikk_t_space(asset) -> bool:
+    for model in asset.get_editor_property("source_models"):
+        build_settings = model.get_editor_property("build_settings")
+        if not build_settings.get_editor_property("use_mikk_t_space"):
+            return False
+    return True
+
+def _get_build_settings(asset, build_property):
+    for model in (asset.get_editor_property("source_models")):
+        build_settings = model.get_editor_property("build_settings")
+        if build_settings.get_editor_property(build_property):
+            return True
+    return None
 
 @dataclass
 class StaticMeshProps(BaseProps):
@@ -12,6 +25,9 @@ class StaticMeshProps(BaseProps):
     collisions: int = 0
     nanite: bool = False
 
+    recompute_normals: bool | None = None
+    recompute_tangents: bool | None = None
+    mikk_t_space: bool | None = None
 
 class StaticMeshPropsAdapter(AssetAdapter):
     requires_u_object = True

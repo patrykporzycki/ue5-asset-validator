@@ -1,5 +1,5 @@
 from __future__ import annotations
-from core.types import Check
+from core.types import Check, FixOption
 from core.types import Alert, Severity
 
 try:
@@ -30,20 +30,6 @@ def _prev_pot(n):
     while p <= n:
         p = p * 2
     return p // 2
-
-class PowerOfTwoCheck(Check):
-
-    def check(self, props, rules) -> list[Alert]:
-        x, y = props.resolution_x, props.resolution_y
-        if _is_power_of_two(x) and _is_power_of_two(y):
-            return []
-        return [Alert(
-            id="power_of_two",
-            severity=Severity.WARNING,
-            message=f"Resolution {props.resolution_x}x{props.resolution_y} is not a power of two!",
-            current_value=f"{props.resolution_x}x{props.resolution_y}",
-        )]
-
 
 class TextureResolutionCheck(Check):
 
@@ -80,15 +66,40 @@ class TextureResolutionCheck(Check):
                 id="max_resolution",
                 severity=Severity.WARNING,
                 message=f"Resolution {x}x{y} exceeds limit of {max_resolution}!",
-                current_value=str(max(x, y)),
+                current_value=[x, y],
                 correct_value=[target_x, target_y],
                 is_fixable=True,
             ))
         return alerts
 
-    def fix(self, asset, alert, props=None):
-        target_x, target_y = alert.correct_value
+    def fix(self, asset, alert, props=None, options=None):
+        if options and options.get('target_resolution'):
+            target_x, target_y = options['target_resolution']
+        else:
+            target_x, target_y = alert.correct_value
         return unreal.TexturePropsHelper.fix_power_of_two(asset, target_x, target_y)
+
+    def get_fix_options(self, alert, props, rules):
+        x, y = props.resolution_x, props.resolution_y
+        target_x, target_y = alert.correct_value
+        max_resolution = max(target_x, target_y)
+
+        longest = max(x, y)
+        choices = []
+        p = _prev_pot(max_resolution//5)
+        while p <= max_resolution:
+            scale = p / longest
+            cx = _prev_pot(int(x * scale))
+            cy = _prev_pot(int(y * scale))
+            choices.append((cx, cy))
+            p = p * 2
+
+        return [FixOption(
+            key="target_resolution",
+            label="Target Resolution",
+            default=(target_x, target_y),
+            choices=tuple(choices),
+        )]
 
 class MipmapCheck(Check):
 
@@ -104,7 +115,7 @@ class MipmapCheck(Check):
             )]
         return []
 
-    def fix(self, asset, alert, options=None):
+    def fix(self, asset, alert, props=None, options=None):
         return _fix_property(asset, "mip_gen_settings", unreal.TextureMipGenSettings.TMGS_FROM_TEXTURE_GROUP,"mipmaps")
 
 
@@ -125,7 +136,7 @@ class SrgbCheck(Check):
             )]
         return []
 
-    def fix(self, asset, alert, options=None):
+    def fix(self, asset, alert, props = None, options=None):
         return _fix_property(asset, "srgb", alert.correct_value, "sRGB")
 
 
@@ -146,11 +157,10 @@ class CompressionCheck(Check):
             )]
         return []
 
-    def fix(self, asset, alert, options=None):
+    def fix(self, asset, alert, props = None, options=None):
         return _fix_property(asset, "compression_settings", getattr(unreal.TextureCompressionSettings, alert.correct_value), "compression")
 
 TEXTURE_CHECKS = [
-    PowerOfTwoCheck(),
     TextureResolutionCheck(),
     MipmapCheck(),
     SrgbCheck(),

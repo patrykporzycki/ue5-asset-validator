@@ -3,33 +3,29 @@ from core.types import Check
 from core.types import Alert, Severity
 
 class LODsCheck(Check):
-    alert_id = "lods"
-    severity = Severity.WARNING
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         if props.lods == 1:
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
+            return [Alert(
+                id="lods",
+                severity=Severity.WARNING,
                 message="LODs are not set!",
                 current_value=str(props.lods),
-            )
-        return None
+            )]
+        return []
 
 class CollisionsCheck(Check):
-    alert_id = "collisions"
-    severity = Severity.WARNING
 
-    def check(self, props, rules) -> Alert | None:
+    def check(self, props, rules) -> list[Alert]:
         if props.collisions == 0:
-            return Alert(
-                id=self.alert_id,
-                severity=self.severity,
+            return [Alert(
+                id="collisions",
+                severity=Severity.WARNING,
                 message="Collisions are not set!",
                 current_value=str(props.collisions),
                 correct_value=None
-            )
-        return None
+            )]
+        return []
 
 SM_MESH_PROPERTIES_CHECKS = [
     LODsCheck(),
