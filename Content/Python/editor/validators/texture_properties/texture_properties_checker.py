@@ -25,6 +25,12 @@ def _fix_property(texture: unreal.Texture2D, property_name: str, correct_value, 
 def _is_power_of_two(n: int) -> bool:
     return n > 0 and (n & (n - 1)) == 0
 
+def _prev_pot(n):
+    p = 1
+    while p <= n:
+        p = p * 2
+    return p // 2
+
 class PowerOfTwoCheck(Check):
 
     def check(self, props, rules) -> list[Alert]:
@@ -39,24 +45,50 @@ class PowerOfTwoCheck(Check):
         )]
 
 
-class MaxResolutionCheck(Check):
+class TextureResolutionCheck(Check):
 
     def check(self, props, rules) -> list[Alert]:
-        current_resolution = max(props.resolution_x, props.resolution_y)
-        if current_resolution > rules['max_resolution']:
-            return [Alert(
+        x, y = props.resolution_x, props.resolution_y
+        max_resolution = rules['max_resolution']
+        is_power_of_two = _is_power_of_two(x) and _is_power_of_two(y)
+        exceeds_max_resolution = max(x,y) > max_resolution
+        if is_power_of_two and exceeds_max_resolution:
+            return []
+
+        longest = max(x, y)
+        cap = min(longest, max_resolution)
+        target_long = _prev_pot(cap)
+
+        scale = target_long /longest
+        if x >= y:
+            target_x, target_y = target_long, _prev_pot(int(y*scale))
+        else:
+            target_x, target_y = _prev_pot(int(x*scale)), target_long
+
+        alerts = []
+        if not is_power_of_two:
+            alerts.append(Alert(
+                id="power_of_two",
+                severity=Severity.ERROR,
+                message=f"Resolution {x}x{y} is not a power of two!",
+                current_value=[x, y],
+                correct_value=[target_x, target_y],
+                is_fixable=True,
+            ))
+        if exceeds_max_resolution:
+            alerts.append(Alert(
                 id="max_resolution",
                 severity=Severity.WARNING,
-                message=f"Resolution {props.resolution_x}x{props.resolution_y} exceeds {rules['max_resolution']}!",
-                current_value=str(current_resolution),
-                correct_value=rules['max_resolution'],
+                message=f"Resolution {x}x{y} exceeds limit of {max_resolution}!",
+                current_value=str(max(x, y)),
+                correct_value=[target_x, target_y],
                 is_fixable=True,
-            )]
-        return []
+            ))
+        return alerts
 
-    def fix(self, asset, alert, options=None):
-        return _fix_property(asset, 'max_texture_size', alert.correct_value, 'max resolution')
-
+    def fix(self, asset, alert, props=None):
+        target_x, target_y = alert.correct_value
+        return unreal.TexturePropsHelper.fix_power_of_two(asset, target_x, target_y)
 
 class MipmapCheck(Check):
 
@@ -119,7 +151,7 @@ class CompressionCheck(Check):
 
 TEXTURE_CHECKS = [
     PowerOfTwoCheck(),
-    MaxResolutionCheck(),
+    TextureResolutionCheck(),
     MipmapCheck(),
     SrgbCheck(),
     CompressionCheck(),

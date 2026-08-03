@@ -53,7 +53,7 @@ class Check:
     def check(self, properties, rules) -> list[Alert]:
         raise NotImplementedError
 
-    def fix(self, asset, alert, props=None) -> bool:
+    def fix(self, asset, alert, props=None, ) -> bool:
         return False
 
 @dataclass(frozen=True)

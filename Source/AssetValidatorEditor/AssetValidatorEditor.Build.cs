@@ -11,6 +11,7 @@ public class AssetValidatorEditor : ModuleRules
             "CoreUObject",
             "Engine",
             "UnrealEd",
+            "ImageCore",
         });
     }
 
