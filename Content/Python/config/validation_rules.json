@@ -1,68 +1,198 @@
 {
-  "max_resolution": 2048,
-  "max_bone_influences": 4,
-  "prefix_rules": {
-    "Texture2D": "T_",
-    "StaticMesh": "SM_",
-    "Material": "M_",
-    "MaterialInstanceConstant": "MI_",
-    "Blueprint": "BP_",
-    "WidgetBlueprint": "WBP_",
-    "AnimBlueprint": "ABP_",
-    "SkeletalMesh": "SK_",
-    "PhysicsAsset": "PHYS_",
-    "NiagaraSystem": "NS_",
-    "NiagaraEmitter": "NE_",
-    "SoundWave": "S_",
-    "SoundCue": "SC_",
-    "ParticleSystem": "P_",
-    "DataTable": "DT_",
-    "CurveTable": "CT_",
-    "TextureRenderTarget2D": "RT_",
-    "Level": "L_",
-    "World": "L_",
-    "ControlRig": "CR_"
+  "schema_version": "1.0",
+  "defaults": {
+    "checks": {
+      "lods": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "collisions": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "bone_influences": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {
+          "max_bone_influences": 4
+        }
+      },
+      "cloth_physics": {
+        "enabled": false,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "recompute_normals": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "recompute_tangents": {
+        "enabled": false,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "mikk_t_space": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "unused_material_slots": {
+        "enabled": false,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "bone_validation": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "texture_resolution": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {
+          "max_resolution": 2048
+        }
+      },
+      "mipmaps": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "srgb": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {
+          "suffix_rules": {
+            "_n": {"srgb": false},
+            "_normal": {"srgb": false},
+            "_r": {"srgb": false},
+            "_roughness": {"srgb": false},
+            "_metallic": {"srgb": false},
+            "_ao": {"srgb": false},
+            "_ambientocclusion": {"srgb": false},
+            "_ambient_occlusion": {"srgb": false},
+            "_orm": {"srgb": false},
+            "_arm": {"srgb": false},
+            "_masks": {"srgb": false},
+            "_mask": {"srgb": false},
+            "_m": {"srgb": false},
+            "_d": {"srgb": true},
+            "_diffuse": {"srgb": true},
+            "_albedo": {"srgb": true},
+            "_basecolor": {"srgb": true},
+            "_base_color": {"srgb": true},
+            "_bc": {"srgb": true},
+            "_color": {"srgb": true},
+            "_spec": {"srgb": false},
+            "_specular": {"srgb": false},
+            "_opacity": {"srgb": false},
+            "_alpha": {"srgb": false},
+            "_e": {"srgb": true},
+            "_emissive": {"srgb": true},
+            "_h": {"srgb": false},
+            "_height": {"srgb": false},
+            "_disp": {"srgb": false},
+            "_displacement": {"srgb": false}
+          }
+        }
+      },
+      "compression": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {
+          "suffix_rules": {
+            "_n": {"compression": ["TC_NORMALMAP", "TC_BC7"]},
+            "_normal": {"compression": ["TC_NORMALMAP", "TC_BC7"]},
+            "_r": {"compression": ["TC_GRAYSCALE"]},
+            "_roughness": {"compression": ["TC_GRAYSCALE"]},
+            "_metallic": {"compression": ["TC_GRAYSCALE"]},
+            "_ao": {"compression": ["TC_GRAYSCALE"]},
+            "_ambientocclusion": {"compression": ["TC_GRAYSCALE"]},
+            "_ambient_occlusion": {"compression": ["TC_GRAYSCALE"]},
+            "_orm": {"compression": ["TC_MASKS"]},
+            "_arm": {"compression": ["TC_MASKS"]},
+            "_masks": {"compression": ["TC_MASKS"]},
+            "_mask": {"compression": ["TC_MASKS"]},
+            "_m": {"compression": ["TC_MASKS"]},
+            "_d": {"compression": ["TC_DEFAULT"]},
+            "_diffuse": {"compression": ["TC_DEFAULT"]},
+            "_albedo": {"compression": ["TC_DEFAULT"]},
+            "_basecolor": {"compression": ["TC_DEFAULT"]},
+            "_base_color": {"compression": ["TC_DEFAULT"]},
+            "_bc": {"compression": ["TC_DEFAULT"]},
+            "_color": {"compression": ["TC_DEFAULT"]},
+            "_spec": {"compression": ["TC_GRAYSCALE"]},
+            "_specular": {"compression": ["TC_GRAYSCALE"]},
+            "_opacity": {"compression": ["TC_GRAYSCALE"]},
+            "_alpha": {"compression": ["TC_GRAYSCALE"]},
+            "_e": {"compression": ["TC_DEFAULT"]},
+            "_emissive": {"compression": ["TC_DEFAULT"]},
+            "_h": {"compression": ["TC_DISPLACEMENT"]},
+            "_height": {"compression": ["TC_DISPLACEMENT"]},
+            "_disp": {"compression": ["TC_DISPLACEMENT"]},
+            "_displacement": {"compression": ["TC_DISPLACEMENT"]}
+          }
+        }
+      },
+      "naming_convention": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {
+          "prefix_rules": {
+            "Texture2D": "T_",
+            "StaticMesh": "SM_",
+            "Material": "M_",
+            "MaterialInstanceConstant": "MI_",
+            "Blueprint": "BP_",
+            "WidgetBlueprint": "WBP_",
+            "AnimBlueprint": "ABP_",
+            "SkeletalMesh": "SK_",
+            "PhysicsAsset": "PHYS_",
+            "NiagaraSystem": "NS_",
+            "NiagaraEmitter": "NE_",
+            "SoundWave": "S_",
+            "SoundCue": "SC_",
+            "ParticleSystem": "P_",
+            "DataTable": "DT_",
+            "CurveTable": "CT_",
+            "TextureRenderTarget2D": "RT_",
+            "Level": "L_",
+            "World": "L_",
+            "ControlRig": "CR_"
+          }
+        }
+      },
+      "broken_references": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "unused_asset": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "unactive_emitters": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      }
+    }
   },
-  "suffix_rules": {
-    "_n": {"srgb": false, "compression": ["TC_NORMALMAP", "TC_BC7"]},
-    "_normal": {"srgb": false, "compression": ["TC_NORMALMAP", "TC_BC7"]},
-
-    "_r": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-    "_roughness": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-
-    "_metallic": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-
-    "_ao": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-    "_ambientocclusion": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-    "_ambient_occlusion": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-
-    "_orm": {"srgb": false, "compression": ["TC_MASKS"]},
-    "_arm": {"srgb": false, "compression": ["TC_MASKS"]},
-
-    "_masks": {"srgb": false, "compression": ["TC_MASKS"]},
-    "_mask": {"srgb": false, "compression": ["TC_MASKS"]},
-    "_m": {"srgb": false, "compression": ["TC_MASKS"]},
-
-    "_d": {"srgb": true, "compression": ["TC_DEFAULT"]},
-    "_diffuse": {"srgb": true, "compression": ["TC_DEFAULT"]},
-    "_albedo": {"srgb": true, "compression": ["TC_DEFAULT"]},
-    "_basecolor": {"srgb": true, "compression": ["TC_DEFAULT"]},
-    "_base_color": {"srgb": true, "compression": ["TC_DEFAULT"]},
-    "_bc": {"srgb": true, "compression": ["TC_DEFAULT"]},
-    "_color": {"srgb": true, "compression": ["TC_DEFAULT"]},
-
-    "_spec": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-    "_specular": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-
-    "_opacity": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-    "_alpha": {"srgb": false, "compression": ["TC_GRAYSCALE"]},
-
-    "_e": {"srgb": true, "compression": ["TC_DEFAULT"]},
-    "_emissive": {"srgb": true, "compression": ["TC_DEFAULT"]},
-
-    "_h": {"srgb": false, "compression": ["TC_DISPLACEMENT"]},
-    "_height": {"srgb": false, "compression": ["TC_DISPLACEMENT"]},
-    "_disp": {"srgb": false, "compression": ["TC_DISPLACEMENT"]},
-    "_displacement": {"srgb": false, "compression": ["TC_DISPLACEMENT"]}
-  }
+  "presets": [
+    {
+      "name": "Characters",
+      "folders": ["/Game/Characters/"],
+      "overrides": {
+        "checks": {
+          "recompute_tangents": {
+            "enabled": false
+          }
+        }
+      }
+    }
+  ]
 }

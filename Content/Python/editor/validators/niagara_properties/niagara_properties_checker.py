@@ -1,9 +1,11 @@
 from core.types import Check
 from core.types import Alert, Severity
 
-class UnactiveEmmitersCheck(Check):
 
-    def check(self, props, rules) -> list[Alert]:
+class UnactiveEmmitersCheck(Check):
+    check_id = "unactive_emitters"
+
+    def check(self, props, config) -> list[Alert]:
         if props.emitters > props.active_emitters:
             return [Alert(
                 id="unactive_emmiters",
@@ -13,6 +15,7 @@ class UnactiveEmmitersCheck(Check):
                 correct_value=str(props.emitters),
             )]
         return []
+
 
 NIAGARA_CHECKS = [
     UnactiveEmmitersCheck()

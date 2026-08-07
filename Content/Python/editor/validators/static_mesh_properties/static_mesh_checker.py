@@ -2,9 +2,11 @@ from __future__ import annotations
 from core.types import Check
 from core.types import Alert, Severity
 
-class LODsCheck(Check):
 
-    def check(self, props, rules) -> list[Alert]:
+class LODsCheck(Check):
+    check_id = "lods"
+
+    def check(self, props, config) -> list[Alert]:
         if props.lods == 1:
             return [Alert(
                 id="lods",
@@ -14,9 +16,11 @@ class LODsCheck(Check):
             )]
         return []
 
-class CollisionsCheck(Check):
 
-    def check(self, props, rules) -> list[Alert]:
+class CollisionsCheck(Check):
+    check_id = "collisions"
+
+    def check(self, props, config) -> list[Alert]:
         if props.collisions == 0:
             return [Alert(
                 id="collisions",
@@ -26,6 +30,7 @@ class CollisionsCheck(Check):
                 correct_value=None
             )]
         return []
+
 
 SM_MESH_PROPERTIES_CHECKS = [
     LODsCheck(),

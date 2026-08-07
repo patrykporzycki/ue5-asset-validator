@@ -26,6 +26,7 @@ class TextureAdapter(AssetAdapter):
         dimensions = _parse_dimensions(self.get_tag(asset_data, "Dimensions"))
         return TextureProps(
             name=str(asset_data.asset_name),
+            path=str(asset_data.package_name),
             resolution_x=int(dimensions[0]),
             resolution_y=int(dimensions[1]),
             compression=self.get_tag(asset_data, "CompressionSettings").upper(),

@@ -2,9 +2,11 @@ from __future__ import annotations
 from core.types import Check
 from core.types import Alert, Severity
 
-class BrokenReferencesCheck(Check):
 
-    def check(self, props, rules) -> list[Alert]:
+class BrokenReferencesCheck(Check):
+    check_id = "broken_references"
+
+    def check(self, props, config) -> list[Alert]:
         if props.broken_references:
             return [Alert(
                 id="broken_references",
@@ -17,8 +19,9 @@ class BrokenReferencesCheck(Check):
 
 
 class UnusedAssetCheck(Check):
+    check_id = "unused_asset"
 
-    def check(self, props, rules) -> list[Alert]:
+    def check(self, props, config) -> list[Alert]:
         if not props.referencers:
             return [Alert(
                 id="unused_asset",

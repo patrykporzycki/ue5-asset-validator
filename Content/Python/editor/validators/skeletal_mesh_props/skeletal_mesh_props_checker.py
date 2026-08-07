@@ -8,6 +8,7 @@ try:
 except ImportError:
     unreal = None
 
+
 def _fix_build_setting(asset, property_name, value):
     SkeletalMeshEditorSubsystem = unreal.get_editor_subsystem(unreal.SkeletalMeshEditorSubsystem)
     for i in range(SkeletalMeshEditorSubsystem.get_lod_count(asset)):
@@ -15,9 +16,11 @@ def _fix_build_setting(asset, property_name, value):
         build_settings.set_editor_property(property_name, value)
         SkeletalMeshEditorSubsystem.set_lod_build_settings(asset, i, build_settings)
 
-class LODsCheck(Check):
 
-    def check(self, props, rules) -> list[Alert]:
+class LODsCheck(Check):
+    check_id = "lods"
+
+    def check(self, props, config) -> list[Alert]:
         if props.lods == 1:
             return [Alert(
                 id="lods",
@@ -29,15 +32,17 @@ class LODsCheck(Check):
 
 
 class BoneInfluencesCheck(Check):
+    check_id = "bone_influences"
 
-    def check(self, props, rules) -> list[Alert]:
-        if props.max_bone_influences > rules["max_bone_influences"]:
+    def check(self, props, config) -> list[Alert]:
+        max_bone_influences = config["params"]["max_bone_influences"]
+        if props.max_bone_influences > max_bone_influences:
             return [Alert(
                 id="bone_influences",
-                severity=Severity.WARNING,
-                message=f"Max bone influence is bigger than {rules['max_bone_influences']}!",
+                severity=Severity.ERROR,
+                message=f"Max bone influence is bigger than {max_bone_influences}!",
                 current_value=str(props.max_bone_influences),
-                correct_value=rules["max_bone_influences"],
+                correct_value=max_bone_influences,
                 is_fixable=True,
             )]
         return []
@@ -53,9 +58,10 @@ class BoneInfluencesCheck(Check):
 
 
 class ClothPhysicsCheck(Check):
+    check_id = "cloth_physics"
     requires_deep = True
 
-    def check(self, props, rules) -> list[Alert]:
+    def check(self, props, config) -> list[Alert]:
         if props.clothing_assets_count > 0 and props.physics_asset == "None":
             return [Alert(
                 id="cloth_physics",
@@ -77,9 +83,10 @@ class ClothPhysicsCheck(Check):
 
 
 class RecomputeNormalsCheck(Check):
+    check_id = "recompute_normals"
     requires_deep = True
 
-    def check(self, props, rules) -> list[Alert]:
+    def check(self, props, config) -> list[Alert]:
         if props.recompute_normals:
             return [Alert(
                 id="recompute_normals",
@@ -98,9 +105,10 @@ class RecomputeNormalsCheck(Check):
 
 
 class RecomputeTangentsCheck(Check):
+    check_id = "recompute_tangents"
     requires_deep = True
 
-    def check(self, props, rules) -> list[Alert]:
+    def check(self, props, config) -> list[Alert]:
         if props.recompute_tangents:
             return [Alert(
                 id="recompute_tangents",
@@ -119,13 +127,14 @@ class RecomputeTangentsCheck(Check):
 
 
 class UseMikkTSpace(Check):
+    check_id = "mikk_t_space"
     requires_deep = True
 
-    def check(self, props, rules) -> list[Alert]:
+    def check(self, props, config) -> list[Alert]:
         if not props.mikk_t_space:
             return [Alert(
                 id="mikk_t_space",
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 message="Use mikk_t_space is disabled in build settings!",
                 current_value=str(props.mikk_t_space),
                 correct_value=True,
@@ -140,9 +149,10 @@ class UseMikkTSpace(Check):
 
 
 class UnusedMaterialSlotsCheck(Check):
+    check_id = "unused_material_slots"
     requires_deep = True
 
-    def check(self, props, rules) -> list[Alert]:
+    def check(self, props, config) -> list[Alert]:
         unused = [
             material for index, material in enumerate(props.materials)
             if index not in props.slot_section_usage
@@ -165,6 +175,7 @@ class UnusedMaterialSlotsCheck(Check):
         unreal.log(f"Removed {len(materials) - len(new_materials)} unused material slots from {asset.get_fname()}")
         return True
 
+
 def _ancestor_chain(name: str, parents: dict):
     chain = []
     current = parents.get(name)
@@ -175,6 +186,7 @@ def _ancestor_chain(name: str, parents: dict):
         current = parents.get(current)
     return tuple(chain)
 
+
 def _hierarchy_matches(bone: str, clean: str, mesh_parents: dict, ref_parents: dict):
     bone_chain = _ancestor_chain(bone, mesh_parents)
     clean_chain = _ancestor_chain(clean, ref_parents)
@@ -183,6 +195,7 @@ def _hierarchy_matches(bone: str, clean: str, mesh_parents: dict, ref_parents: d
     clean_stripped = tuple(re.sub(r"_\d+$", "", b) for b in clean_chain)
 
     return bone_stripped == clean_stripped
+
 
 def _categorize_extra_bones(props):
     reference_bones = set(props.reference_bones_hierarchy or {})
@@ -206,10 +219,12 @@ def _categorize_extra_bones(props):
 
     return fixable, hierarchy_mismatch, not_in_ref
 
+
 class BoneValidationCheck(Check):
+    check_id = "bone_validation"
     requires_deep = True
 
-    def check(self, props, rules) -> list[Alert]:
+    def check(self, props, config) -> list[Alert]:
         fixable, hierarchy_mismatch, not_in_ref = _categorize_extra_bones(props)
         alerts = []
         if fixable:
@@ -226,7 +241,7 @@ class BoneValidationCheck(Check):
             bones, _ = zip(*hierarchy_mismatch)
             alerts.append(Alert(
                 id="bones_hierarchy_mismatch",
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 message=f"Bones with wrong hierarchy: {list(bones)}!",
                 current_value=list(bones),
             ))

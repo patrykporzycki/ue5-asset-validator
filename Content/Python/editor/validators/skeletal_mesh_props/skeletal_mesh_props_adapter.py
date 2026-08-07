@@ -92,6 +92,7 @@ class SkeletalMeshPropsAdapter(AssetAdapter):
     def get_properties(self, asset_data: unreal.AssetData, asset=None) -> SkeletalMeshProps:
         props = SkeletalMeshProps(
             name = str(asset_data.asset_name),
+            path=str(asset_data.package_name),
             triangles = int(self.get_tag(asset_data, "Triangles") or 0),
             lods = int(self.get_tag(asset_data, "LODs") or 0),
             bones =  int(self.get_tag(asset_data, "Bones") or 0),

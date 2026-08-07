@@ -30,6 +30,7 @@ class ReferencesAdapter(AssetAdapter):
 
         return ReferencesProps(
             name=str(asset_data.asset_name),
+            path=str(asset_data.package_name),
             asset_class=str(asset_data.asset_class_path.asset_name),
             package_name=str(asset_data.package_name),
             broken_references=broken_references,

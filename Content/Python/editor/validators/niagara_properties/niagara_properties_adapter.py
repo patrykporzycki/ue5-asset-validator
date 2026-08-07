@@ -19,6 +19,7 @@ class NiagaraAdapter(AssetAdapter):
         fixed_bounds_size = self.get_tag(asset_data, "FixedBoundsSize")
         return NiagaraProps(
             name=str(asset_data.asset_name),
+            path=str(asset_data.package_name),
             emitters=int(self.get_tag(asset_data, "NumEmitters") or 0),
             active_emitters=int(self.get_tag(asset_data, "ActiveEmitters") or 0),
             has_gpu_emitter=str(self.get_tag(asset_data, "HasGPUEmitter")),

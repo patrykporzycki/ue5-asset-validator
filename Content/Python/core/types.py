@@ -22,6 +22,7 @@ class AssetAdapter:
 @dataclass
 class BaseProps:
     name: str
+    path: str = ""
 
 @dataclass(frozen=True)
 class Alert:
@@ -48,6 +49,7 @@ class FixOption:
     choices: tuple | None = None
 
 class Check:
+    check_id: str = ""
     requires_deep: bool = False
     fix_options: list[FixOption] = []
 
