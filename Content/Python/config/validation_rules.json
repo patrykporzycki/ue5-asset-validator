@@ -175,7 +175,7 @@
         "exclude_folders": [],
         "params": {}
       },
-      "unactive_emitters": {
+      "inactive_emitters": {
         "enabled": true,
         "exclude_folders": [],
         "params": {}
