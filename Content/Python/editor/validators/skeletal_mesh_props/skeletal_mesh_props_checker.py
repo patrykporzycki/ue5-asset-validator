@@ -1,21 +1,13 @@
 from __future__ import annotations
 from core.types import Check
 from core.types import Alert, Severity
+from editor.validators.mesh_build_settings.mesh_build_settings_checker import MESH_BUILD_SETTINGS_CHECKS
 import re
 
 try:
     import unreal
 except ImportError:
     unreal = None
-
-
-def _fix_build_setting(asset, property_name, value):
-    SkeletalMeshEditorSubsystem = unreal.get_editor_subsystem(unreal.SkeletalMeshEditorSubsystem)
-    for i in range(SkeletalMeshEditorSubsystem.get_lod_count(asset)):
-        build_settings = SkeletalMeshEditorSubsystem.get_lod_build_settings(asset, i)
-        build_settings.set_editor_property(property_name, value)
-        SkeletalMeshEditorSubsystem.set_lod_build_settings(asset, i, build_settings)
-
 
 class LODsCheck(Check):
     check_id = "lods"
@@ -29,7 +21,6 @@ class LODsCheck(Check):
                 current_value=str(props.lods),
             )]
         return []
-
 
 class BoneInfluencesCheck(Check):
     check_id = "bone_influences"
@@ -80,73 +71,6 @@ class ClothPhysicsCheck(Check):
         unreal.EditorAssetLibrary.save_asset(physics_asset.get_path_name())
         unreal.log(f"Created physics asset for asset {asset.get_fname()}")
         return True
-
-
-class RecomputeNormalsCheck(Check):
-    check_id = "recompute_normals"
-    requires_deep = True
-
-    def check(self, props, config) -> list[Alert]:
-        if props.recompute_normals:
-            return [Alert(
-                id="recompute_normals",
-                severity=Severity.WARNING,
-                message="Recompute Normals is enabled in build settings!",
-                current_value=str(props.recompute_normals),
-                correct_value=False,
-                is_fixable=True,
-            )]
-        return []
-
-    def fix(self, asset, alert, props=None, options=None):
-        _fix_build_setting(asset, "recompute_normals", alert.correct_value)
-        unreal.log(f"Set recompute_normals false for asset {asset.get_fname()}")
-        return True
-
-
-class RecomputeTangentsCheck(Check):
-    check_id = "recompute_tangents"
-    requires_deep = True
-
-    def check(self, props, config) -> list[Alert]:
-        if props.recompute_tangents:
-            return [Alert(
-                id="recompute_tangents",
-                severity=Severity.WARNING,
-                message="Recompute Tangents is enabled in build settings!",
-                current_value=str(props.recompute_tangents),
-                correct_value=False,
-                is_fixable=True,
-            )]
-        return []
-
-    def fix(self, asset, alert, props=None, options=None):
-        _fix_build_setting(asset, "recompute_tangents", alert.correct_value)
-        unreal.log(f"Set recompute_tangents false for asset {asset.get_fname()}")
-        return True
-
-
-class UseMikkTSpace(Check):
-    check_id = "mikk_t_space"
-    requires_deep = True
-
-    def check(self, props, config) -> list[Alert]:
-        if not props.mikk_t_space:
-            return [Alert(
-                id="mikk_t_space",
-                severity=Severity.ERROR,
-                message="Use mikk_t_space is disabled in build settings!",
-                current_value=str(props.mikk_t_space),
-                correct_value=True,
-                is_fixable=True,
-            )]
-        return []
-
-    def fix(self, asset, alert, props=None, options=None):
-        _fix_build_setting(asset, "use_mikk_t_space", alert.correct_value)
-        unreal.log(f"Set use_mikk_t_space true for asset {asset.get_fname()}")
-        return True
-
 
 class UnusedMaterialSlotsCheck(Check):
     check_id = "unused_material_slots"
@@ -266,14 +190,11 @@ class BoneValidationCheck(Check):
         unreal.log(f"Renamed {len(alert.current_value)} bones!")
         return True
 
-
 SKELETAL_MESH_PROPS_CHECKS = [
+    *MESH_BUILD_SETTINGS_CHECKS,
     LODsCheck(),
     BoneInfluencesCheck(),
     ClothPhysicsCheck(),
-    RecomputeNormalsCheck(),
-    RecomputeTangentsCheck(),
-    UseMikkTSpace(),
     UnusedMaterialSlotsCheck(),
     BoneValidationCheck(),
 ]

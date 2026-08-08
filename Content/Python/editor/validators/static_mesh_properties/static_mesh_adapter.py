@@ -3,19 +3,22 @@ from dataclasses import dataclass
 import unreal
 from core.types import AssetAdapter, BaseProps
 
+
 def _get_mikk_t_space(asset) -> bool:
-    for model in asset.get_editor_property("source_models"):
-        build_settings = model.get_editor_property("build_settings")
+    subsys = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
+    for lod in range(subsys.get_lod_count(asset)):
+        build_settings = subsys.get_lod_build_settings(asset, lod)
         if not build_settings.get_editor_property("use_mikk_t_space"):
             return False
     return True
 
 def _get_build_settings(asset, build_property):
-    for model in (asset.get_editor_property("source_models")):
-        build_settings = model.get_editor_property("build_settings")
+    subsys = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
+    for lod in range(subsys.get_lod_count(asset)):
+        build_settings = subsys.get_lod_build_settings(asset, lod)
         if build_settings.get_editor_property(build_property):
             return True
-    return None
+    return False
 
 @dataclass
 class StaticMeshProps(BaseProps):
@@ -28,12 +31,14 @@ class StaticMeshProps(BaseProps):
     recompute_normals: bool | None = None
     recompute_tangents: bool | None = None
     mikk_t_space: bool | None = None
+    generate_lightmap_u_vs: bool | None = None
+    remove_degenerates: bool | None = None
 
 class StaticMeshPropsAdapter(AssetAdapter):
     requires_u_object = True
 
-    def get_properties(self, asset_data: unreal.AssetData, asset = None):
-        return StaticMeshProps(
+    def get_properties(self, asset_data: unreal.AssetData, asset=None):
+        props = StaticMeshProps(
             name=str(asset_data.asset_name),
             path=str(asset_data.package_name),
             triangles=int(self.get_tag(asset_data, "Triangles") or 0),
@@ -42,3 +47,10 @@ class StaticMeshPropsAdapter(AssetAdapter):
             collisions=int(self.get_tag(asset_data, "CollisionPrims") or 0),
             nanite=bool(self.get_tag(asset_data, "NaniteEnabled") or 0),
         )
+        if asset:
+            props.recompute_normals = _get_build_settings(asset, "recompute_normals")
+            props.recompute_tangents = _get_build_settings(asset, "recompute_tangents")
+            props.mikk_t_space = _get_mikk_t_space(asset)
+            props.generate_lightmap_u_vs = _get_build_settings(asset, "generate_lightmap_u_vs")
+            props.remove_degenerates = _get_build_settings(asset, "remove_degenerates")
+        return props

@@ -3,7 +3,6 @@ from dataclasses import dataclass
 import unreal
 from core.types import AssetAdapter, BaseProps
 
-
 def _get_materials_properties(asset):
     slot_section_usage = {}
     SkeletalMeshEditorSubsystem = unreal.get_editor_subsystem(unreal.SkeletalMeshEditorSubsystem)
@@ -26,7 +25,6 @@ def _get_materials_properties(asset):
 
     return material_slots, slot_section_usage
 
-
 def _get_mikk_t_space(asset) -> bool:
     for model in asset.get_editor_property("source_models"):
         build_settings = model.get_editor_property("build_settings")
@@ -39,7 +37,7 @@ def _get_build_settings(asset, build_property):
         build_settings = model.get_editor_property("build_settings")
         if build_settings.get_editor_property(build_property):
             return True
-    return None
+    return False
 
 def _get_clothing_asset_count(asset):
     clothing_asset_count = len(asset.get_editor_property("mesh_clothing_assets"))
