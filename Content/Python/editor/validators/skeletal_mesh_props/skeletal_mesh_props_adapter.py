@@ -78,6 +78,7 @@ class SkeletalMeshProps(BaseProps):
     recompute_normals: bool | None = None
     recompute_tangents: bool | None = None
     mikk_t_space: bool | None = None
+    remove_degenerates: bool | None = None
     materials: list | None = None
     slot_section_usage: dict[int, set[int]] | None = None
     mesh_bones_hierarchy: dict[str, str | None] | None = None
@@ -104,6 +105,7 @@ class SkeletalMeshPropsAdapter(AssetAdapter):
             props.recompute_normals = _get_build_settings(asset, "recompute_normals")
             props.recompute_tangents = _get_build_settings(asset, "recompute_tangents")
             props.mikk_t_space = _get_mikk_t_space(asset)
+            props.remove_degenerates = _get_build_settings(asset, "remove_degenerates")
             props.materials, props.slot_section_usage = _get_materials_properties(asset)
             props.mesh_bones_hierarchy = _get_mesh_bones_hierarchy(asset)
             props.reference_bones_hierarchy = _get_reference_bones_hierarchy(asset)

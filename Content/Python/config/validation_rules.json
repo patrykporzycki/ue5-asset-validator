@@ -27,15 +27,42 @@
       "recompute_normals": {
         "enabled": true,
         "exclude_folders": [],
-        "params": {}
+        "params": {
+          "expected_value": false
+        }
       },
       "recompute_tangents": {
         "enabled": false,
         "exclude_folders": [],
-        "params": {}
+        "params": {
+          "expected_value": false
+        }
       },
       "mikk_t_space": {
         "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "no_tangent_source": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "remove_degenerates": {
+        "enabled": false,
+        "exclude_folders": [],
+        "params": {}
+      },
+      "nanite": {
+        "enabled": false,
+        "exclude_folders": [],
+        "params": {
+          "expected_value": true,
+          "min_triangles": 5000
+        }
+      },
+      "generate_lightmap_u_vs": {
+        "enabled": false,
         "exclude_folders": [],
         "params": {}
       },

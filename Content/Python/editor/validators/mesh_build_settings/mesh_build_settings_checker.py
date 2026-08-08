@@ -107,9 +107,32 @@ class RecomputeTangentsCheck(Check):
         unreal.log(f"Set recompute_tangents to {alert.correct_value} for {asset.get_fname()}")
         return True
 
+class RemoveDegeneratesCheck(Check):
+    check_id = "remove_degenerates"
+    requires_deep = True
+
+    def check(self, props, config) -> list[Alert]:
+        if props.remove_degenerates is False:
+            return [Alert(
+                id="remove_degenerates",
+                severity=Severity.WARNING,
+                message="Remove Degenerates is OFF.",
+                current_value=False,
+                correct_value=True,
+                is_fixable=True,
+            )]
+        return []
+
+    def fix(self, asset, alert, props=None, options=None):
+        _fix_build_setting(asset, "remove_degenerates", True)
+        unreal.log(f"Set remove_degenerates true for {asset.get_fname()}")
+        return True
+
+
 MESH_BUILD_SETTINGS_CHECKS = [
     MikkTSpaceCheck(),
     NoTangentSourceCheck(),
     RecomputeNormalsCheck(),
     RecomputeTangentsCheck(),
+    RemoveDegeneratesCheck(),
 ]
