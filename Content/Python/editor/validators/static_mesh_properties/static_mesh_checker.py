@@ -2,6 +2,8 @@ from __future__ import annotations
 from core.types import Check
 from core.types import Alert, Severity
 
+from editor.validators.mesh_build_settings.mesh_build_settings_checker import MESH_BUILD_SETTINGS_CHECKS
+
 
 class LODsCheck(Check):
     check_id = "lods"
@@ -33,6 +35,7 @@ class CollisionsCheck(Check):
 
 
 SM_MESH_PROPERTIES_CHECKS = [
+    *MESH_BUILD_SETTINGS_CHECKS,
     LODsCheck(),
-    CollisionsCheck()
+    CollisionsCheck(),
 ]
