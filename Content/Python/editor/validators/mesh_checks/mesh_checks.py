@@ -128,11 +128,26 @@ class RemoveDegeneratesCheck(Check):
         unreal.log(f"Set remove_degenerates true for {asset.get_fname()}")
         return True
 
+class TriangleCountCheck(Check):
+    check_id = "triangle_count"
 
-MESH_BUILD_SETTINGS_CHECKS = [
+    def check(self, props, config) -> list[Alert]:
+        max_tris_count = config.get("params", {}).get("max_triangles", 0)
+        if max_tris_count and props.triangles > max_tris_count:
+            return [Alert(
+                id="triangle_count",
+                severity=Severity.WARNING,
+                message=f"{props.triangles} triangles exceeds limit of {max_tris_count}!",
+                current_value=props.triangles,
+                correct_value=max_tris_count,
+            )]
+        return []
+
+MESH_CHECKS = [
     MikkTSpaceCheck(),
     NoTangentSourceCheck(),
     RecomputeNormalsCheck(),
     RecomputeTangentsCheck(),
     RemoveDegeneratesCheck(),
+    TriangleCountCheck(),
 ]

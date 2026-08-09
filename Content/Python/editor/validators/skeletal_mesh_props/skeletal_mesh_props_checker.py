@@ -1,7 +1,7 @@
 from __future__ import annotations
 from core.types import Check
 from core.types import Alert, Severity
-from editor.validators.mesh_build_settings.mesh_build_settings_checker import MESH_BUILD_SETTINGS_CHECKS
+from editor.validators.mesh_checks.mesh_checks import MESH_CHECKS
 import re
 
 try:
@@ -191,7 +191,7 @@ class BoneValidationCheck(Check):
         return True
 
 SKELETAL_MESH_PROPS_CHECKS = [
-    *MESH_BUILD_SETTINGS_CHECKS,
+    *MESH_CHECKS,
     LODsCheck(),
     BoneInfluencesCheck(),
     ClothPhysicsCheck(),
