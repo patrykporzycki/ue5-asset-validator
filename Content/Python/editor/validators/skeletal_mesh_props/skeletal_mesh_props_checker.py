@@ -47,7 +47,6 @@ class BoneInfluencesCheck(Check):
         unreal.log(f"Fixed bone influences for asset {asset.get_fname()}. Reduced from {alert.current_value} to {alert.correct_value}")
         return True
 
-
 class ClothPhysicsCheck(Check):
     check_id = "cloth_physics"
     requires_deep = True
@@ -99,6 +98,19 @@ class UnusedMaterialSlotsCheck(Check):
         unreal.log(f"Removed {len(materials) - len(new_materials)} unused material slots from {asset.get_fname()}")
         return True
 
+class MorphTargetsTangentsCheck(Check):
+    check_id = "morph_targets_tangents"
+    requires_deep = True
+
+    def check(self, props, config) -> list[Alert]:
+        if props.morphs > 0 and props.has_tangents_vertex_mask is False:
+            return [Alert(
+                id="morph_targets_tangents",
+                severity=Severity.WARNING,
+                message=f"Skeletal mesh has {props.morphs} morph targets but no Recompute Tangents vertex mask channel set, normal maps will deform incorrectly!",
+                current_value={"morphs": props.morphs, "has_tangents_vertex_mask": False},
+            )]
+        return []
 
 def _ancestor_chain(name: str, parents: dict):
     chain = []
@@ -197,4 +209,5 @@ SKELETAL_MESH_PROPS_CHECKS = [
     ClothPhysicsCheck(),
     UnusedMaterialSlotsCheck(),
     BoneValidationCheck(),
+    MorphTargetsTangentsCheck(),
 ]

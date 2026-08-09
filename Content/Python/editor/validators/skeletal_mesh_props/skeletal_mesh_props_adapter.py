@@ -43,6 +43,16 @@ def _get_clothing_asset_count(asset):
     clothing_asset_count = len(asset.get_editor_property("mesh_clothing_assets"))
     return clothing_asset_count
 
+
+def _has_tangents_vertex_mask_channel(asset) -> bool:
+    subsystem = unreal.get_editor_subsystem(unreal.SkeletalMeshEditorSubsystem)
+    for lod in range(subsystem.get_lod_count(asset)):
+        for section in range(subsystem.get_num_sections(asset, lod)):
+            mask = subsystem.get_section_recompute_tangents_vertex_mask_channel(asset, lod, section)
+            if mask is not None and int(mask) < 3:
+                return True
+    return False
+
 def _get_mesh_bones_hierarchy(asset) -> dict[str, str | None]:
     modifier = unreal.SkeletonModifier()
     if not modifier.set_skeletal_mesh(asset):
@@ -79,6 +89,7 @@ class SkeletalMeshProps(BaseProps):
     recompute_tangents: bool | None = None
     mikk_t_space: bool | None = None
     remove_degenerates: bool | None = None
+    has_tangents_vertex_mask: bool | None = None
     materials: list | None = None
     slot_section_usage: dict[int, set[int]] | None = None
     mesh_bones_hierarchy: dict[str, str | None] | None = None
@@ -106,6 +117,7 @@ class SkeletalMeshPropsAdapter(AssetAdapter):
             props.recompute_tangents = _get_build_settings(asset, "recompute_tangents")
             props.mikk_t_space = _get_mikk_t_space(asset)
             props.remove_degenerates = _get_build_settings(asset, "remove_degenerates")
+            props.has_tangents_vertex_mask = _has_tangents_vertex_mask_channel(asset)
             props.materials, props.slot_section_usage = _get_materials_properties(asset)
             props.mesh_bones_hierarchy = _get_mesh_bones_hierarchy(asset)
             props.reference_bones_hierarchy = _get_reference_bones_hierarchy(asset)

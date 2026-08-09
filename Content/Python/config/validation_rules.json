@@ -61,6 +61,11 @@
           "min_triangles": 5000
         }
       },
+      "morph_targets_tangents": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
+      },
       "generate_lightmap_u_vs": {
         "enabled": false,
         "exclude_folders": [],
