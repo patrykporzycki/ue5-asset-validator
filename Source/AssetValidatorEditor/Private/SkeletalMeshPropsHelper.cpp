@@ -1,7 +1,7 @@
-#include "SkeletonReferenceHelper.h"
+#include "SkeletalMeshPropsHelper.h"
 #include "Engine/SkeletalMesh.h"
 
-TArray<FString> USkeletonReferenceHelper::GetSkeletonBoneNames(USkeletalMesh* Mesh)
+TArray<FString> USkeletalMeshPropsHelper::GetSkeletonBoneNames(USkeletalMesh* Mesh)
 {
     TArray<FString> BoneNames;
     if (!Mesh)
@@ -17,7 +17,7 @@ TArray<FString> USkeletonReferenceHelper::GetSkeletonBoneNames(USkeletalMesh* Me
     return BoneNames;
 }
 
-TArray<int32> USkeletonReferenceHelper::GetReferenceSkeletonIndices(USkeletalMesh* Mesh)
+TArray<int32> USkeletalMeshPropsHelper::GetReferenceSkeletonIndices(USkeletalMesh* Mesh)
 {
     TArray<int32> Indices;
     if (!Mesh)

@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "SkeletonReferenceHelper.generated.h"
+#include "SkeletalMeshPropsHelper.generated.h"
 
 UCLASS()
-class ASSETVALIDATOREDITOR_API USkeletonReferenceHelper : public UBlueprintFunctionLibrary
+class ASSETVALIDATOREDITOR_API USkeletalMeshPropsHelper : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

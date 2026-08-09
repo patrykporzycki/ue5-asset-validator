@@ -11,7 +11,7 @@ class MaterialProps(BaseProps):
     material_domain: str = ""
 
 
-class MaterialPropertiesAdapter(AssetAdapter):
+class MaterialPropsAdapter(AssetAdapter):
     requires_u_object = True
 
     def get_properties(self, asset_data: unreal.AssetData, asset=None):

@@ -102,7 +102,7 @@ class GenerateLightmapUVCheck(Check):
         return True
 
 
-SM_MESH_PROPERTIES_CHECKS = [
+SM_MESH_PROPS_CHECKS = [
     *MESH_CHECKS,
     LODsCheck(),
     CollisionsCheck(),

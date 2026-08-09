@@ -65,8 +65,8 @@ def _get_mesh_bones_hierarchy(asset) -> dict[str, str | None]:
     return parents
 
 def _get_reference_bones_hierarchy(asset) -> dict[str, str | None]:
-    bone_names = [bone for bone in unreal.SkeletonReferenceHelper.get_skeleton_bone_names(asset)]
-    parent_indices = list(unreal.SkeletonReferenceHelper.get_reference_skeleton_indices(asset))
+    bone_names = [bone for bone in unreal.SkeletalMeshPropsHelper.get_skeleton_bone_names(asset)]
+    parent_indices = list(unreal.SkeletalMeshPropsHelper.get_reference_skeleton_indices(asset))
 
     parents = {}
     for i, name in enumerate(bone_names):
