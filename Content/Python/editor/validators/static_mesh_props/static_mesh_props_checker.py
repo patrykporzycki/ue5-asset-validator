@@ -8,7 +8,6 @@ try:
 except ImportError:
     unreal = None
 
-
 class LODsCheck(Check):
     check_id = "lods"
 
@@ -43,7 +42,7 @@ class NaniteCheck(Check):
     def check(self, props, config) -> list[Alert]:
         alerts = []
         expected = config.get("params", {}).get("expected_value", True)
-        min_tri = config.get("params", {}).get("min_triangles", 5000)
+        min_tris = config.get("params", {}).get("min_triangles", 5000)
 
         if props.nanite != expected:
             alerts.append(Alert(
@@ -55,7 +54,7 @@ class NaniteCheck(Check):
                 is_fixable=True,
             ))
 
-        if props.nanite and props.triangles < min_tri:
+        if props.nanite and props.triangles < min_tris:
             alerts.append(Alert(
                 id="nanite_lowpoly",
                 severity=Severity.INFO,

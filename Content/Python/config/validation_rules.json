@@ -49,7 +49,7 @@
         "params": {}
       },
       "remove_degenerates": {
-        "enabled": false,
+        "enabled": true,
         "exclude_folders": [],
         "params": {}
       },

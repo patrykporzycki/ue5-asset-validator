@@ -12,6 +12,8 @@ public class AssetValidatorEditor : ModuleRules
             "Engine",
             "UnrealEd",
             "ImageCore",
+            "MeshDescription",
+            "StaticMeshDescription",
         });
     }
 

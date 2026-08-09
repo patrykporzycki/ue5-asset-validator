@@ -1,7 +1,7 @@
 from dataclasses import dataclass
+from core.types import AssetAdapter, BaseProps
 
 import unreal
-from core.types import AssetAdapter, BaseProps
 
 
 def _get_mikk_t_space(asset) -> bool:
@@ -20,6 +20,12 @@ def _get_build_settings(asset, build_property):
             return True
     return False
 
+def _has_source_normals(asset):
+    return unreal.StaticMeshPropsHelper.has_source_normals(asset)
+
+def _has_degenerates_triangles(asset):
+    return unreal.StaticMeshPropsHelper.has_degenerate_triangles(asset)
+
 @dataclass
 class StaticMeshProps(BaseProps):
     triangles: int = 0
@@ -33,6 +39,8 @@ class StaticMeshProps(BaseProps):
     mikk_t_space: bool | None = None
     generate_lightmap_u_vs: bool | None = None
     remove_degenerates: bool | None = None
+    has_source_normals: bool | None = None
+    has_degenerates_triangles: bool | None = None
 
 class StaticMeshPropsAdapter(AssetAdapter):
     requires_u_object = True
@@ -53,4 +61,6 @@ class StaticMeshPropsAdapter(AssetAdapter):
             props.mikk_t_space = _get_mikk_t_space(asset)
             props.generate_lightmap_u_vs = _get_build_settings(asset, "generate_lightmap_u_vs")
             props.remove_degenerates = _get_build_settings(asset, "remove_degenerates")
+            props.has_source_normals = _has_source_normals(asset)
+            props.has_degenerates_triangles = _has_degenerates_triangles(asset)
         return props

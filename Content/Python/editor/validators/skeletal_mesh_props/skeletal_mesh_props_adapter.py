@@ -85,6 +85,8 @@ class SkeletalMeshProps(BaseProps):
     morphs: int = 0
 
     clothing_assets_count: int | None = None
+    has_source_normals: bool | None = None
+    has_degenerates_triangles: bool | None = None
     recompute_normals: bool | None = None
     recompute_tangents: bool | None = None
     mikk_t_space: bool | None = None
