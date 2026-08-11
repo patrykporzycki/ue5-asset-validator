@@ -74,6 +74,9 @@ def _get_reference_bones_hierarchy(asset) -> dict[str, str | None]:
         parents[name] = bone_names[index] if index >= 0 else None
     return parents
 
+def _has_degenerates_triangles(asset):
+    return unreal.MeshPropsHelper.skeletal_mesh_has_degenerate_triangles(asset)
+
 @dataclass
 class SkeletalMeshProps(BaseProps):
     triangles: int = 0
@@ -85,7 +88,6 @@ class SkeletalMeshProps(BaseProps):
     morphs: int = 0
 
     clothing_assets_count: int | None = None
-    has_source_normals: bool | None = None
     has_degenerates_triangles: bool | None = None
     recompute_normals: bool | None = None
     recompute_tangents: bool | None = None
@@ -119,6 +121,7 @@ class SkeletalMeshPropsAdapter(AssetAdapter):
             props.recompute_tangents = _get_build_settings(asset, "recompute_tangents")
             props.mikk_t_space = _get_mikk_t_space(asset)
             props.remove_degenerates = _get_build_settings(asset, "remove_degenerates")
+            props.has_degenerates_triangles = _has_degenerates_triangles(asset)
             props.has_tangents_vertex_mask = _has_tangents_vertex_mask_channel(asset)
             props.materials, props.slot_section_usage = _get_materials_properties(asset)
             props.mesh_bones_hierarchy = _get_mesh_bones_hierarchy(asset)

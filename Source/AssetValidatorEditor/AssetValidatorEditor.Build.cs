@@ -14,6 +14,7 @@ public class AssetValidatorEditor : ModuleRules
             "ImageCore",
             "MeshDescription",
             "StaticMeshDescription",
+            "SkeletalMeshDescription",
         });
     }
 

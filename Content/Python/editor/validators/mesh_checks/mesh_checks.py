@@ -64,26 +64,6 @@ class RecomputeNormalsCheck(Check):
     requires_deep = True
 
     def check(self, props, config) -> list[Alert]:
-        if props.has_source_normals is not None:
-            if props.recompute_normals is True and props.has_source_normals is True:
-                return [Alert(
-                    id="recompute_normals",
-                    severity=Severity.WARNING,
-                    message="Recompute Normals is ON but mesh has proper source normals, discarding source normals!",
-                    current_value=str(props.recompute_normals),
-                    correct_value=False,
-                    is_fixable=True,
-                )]
-            if props.recompute_normals is False and props.has_source_normals is False:
-                return [Alert(
-                    id="recompute_normals",
-                    severity=Severity.WARNING,
-                    message="Mesh has invalid source normals and Recompute Normals is OFF!",
-                    current_value=str(props.recompute_normals),
-                    correct_value=True,
-                    is_fixable=True,
-                )]
-            return []
         expected = config.get("params", {}).get("expected_value", False)
         if props.recompute_normals is None:
             return []
@@ -132,22 +112,11 @@ class RemoveDegeneratesCheck(Check):
     requires_deep = True
 
     def check(self, props, config) -> list[Alert]:
-        if props.has_degenerates_triangles is not None:
-            if props.has_degenerates_triangles is True and props.remove_degenerates is False:
-                return [Alert(
-                    id="remove_degenerates",
-                    severity=Severity.WARNING,
-                    message="Mesh has degenerate triangles but Remove Degenerates is OFF.",
-                    current_value=False,
-                    correct_value=True,
-                    is_fixable=True,
-                )]
-            return []
-        if props.remove_degenerates is False:
+        if props.has_degenerates_triangles is True and props.remove_degenerates is False:
             return [Alert(
                 id="remove_degenerates",
                 severity=Severity.WARNING,
-                message="Remove Degenerates is OFF.",
+                message="Mesh has degenerate triangles but Remove Degenerates is OFF!",
                 current_value=False,
                 correct_value=True,
                 is_fixable=True,
@@ -178,7 +147,7 @@ MESH_CHECKS = [
     MikkTSpaceCheck(),
     NoTangentSourceCheck(),
     RecomputeNormalsCheck(),
-    #RecomputeTangentsCheck(),
+    RecomputeTangentsCheck(),
     RemoveDegeneratesCheck(),
     TriangleCountCheck(),
 ]
