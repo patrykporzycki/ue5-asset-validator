@@ -2,42 +2,7 @@ from dataclasses import dataclass
 
 import unreal
 from core.types import AssetAdapter, BaseProps
-
-def _get_materials_properties(asset):
-    slot_section_usage = {}
-    SkeletalMeshEditorSubsystem = unreal.get_editor_subsystem(unreal.SkeletalMeshEditorSubsystem)
-    for lod in range(SkeletalMeshEditorSubsystem.get_lod_count(asset)):
-        for section in range(SkeletalMeshEditorSubsystem.get_num_sections(asset, lod)):
-            slot_index = SkeletalMeshEditorSubsystem.get_lod_material_slot(asset, lod, section)
-            if slot_index >= 0:
-                if slot_index not in slot_section_usage:
-                    slot_section_usage[slot_index] = set()
-                slot_section_usage[slot_index].add(section)
-
-    materials = asset.get_editor_property("materials")
-    material_slots = []
-    for material in materials:
-        material_interface = material.get_editor_property("material_interface")
-        material_slots.append({
-            "slot_name": material.get_editor_property("material_slot_name"),
-            "material": material_interface.get_name() if material_interface else None,
-        })
-
-    return material_slots, slot_section_usage
-
-def _get_mikk_t_space(asset) -> bool:
-    for model in asset.get_editor_property("source_models"):
-        build_settings = model.get_editor_property("build_settings")
-        if not build_settings.get_editor_property("use_mikk_t_space"):
-            return False
-    return True
-
-def _get_build_settings(asset, build_property):
-    for model in (asset.get_editor_property("source_models")):
-        build_settings = model.get_editor_property("build_settings")
-        if build_settings.get_editor_property(build_property):
-            return True
-    return False
+from editor.validators.mesh_checks.mesh_utils import get_build_setting, get_mikk_t_space, get_materials_properties
 
 def _get_clothing_asset_count(asset):
     clothing_asset_count = len(asset.get_editor_property("mesh_clothing_assets"))
@@ -117,13 +82,13 @@ class SkeletalMeshPropsAdapter(AssetAdapter):
         )
         if asset:
             props.clothing_assets_count = _get_clothing_asset_count(asset)
-            props.recompute_normals = _get_build_settings(asset, "recompute_normals")
-            props.recompute_tangents = _get_build_settings(asset, "recompute_tangents")
-            props.mikk_t_space = _get_mikk_t_space(asset)
-            props.remove_degenerates = _get_build_settings(asset, "remove_degenerates")
+            props.recompute_normals = get_build_setting(asset, "recompute_normals")
+            props.recompute_tangents = get_build_setting(asset, "recompute_tangents")
+            props.mikk_t_space = get_mikk_t_space(asset)
+            props.remove_degenerates = get_build_setting(asset, "remove_degenerates")
             props.has_degenerates_triangles = _has_degenerates_triangles(asset)
             props.has_tangents_vertex_mask = _has_tangents_vertex_mask_channel(asset)
-            props.materials, props.slot_section_usage = _get_materials_properties(asset)
+            props.materials, props.slot_section_usage = get_materials_properties(asset)
             props.mesh_bones_hierarchy = _get_mesh_bones_hierarchy(asset)
             props.reference_bones_hierarchy = _get_reference_bones_hierarchy(asset)
         return props

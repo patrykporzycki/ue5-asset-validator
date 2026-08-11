@@ -143,6 +143,39 @@ class TriangleCountCheck(Check):
             )]
         return []
 
+class UnusedMaterialSlotsCheck(Check):
+    check_id = "unused_material_slots"
+    requires_deep = True
+
+    def check(self, props, config) -> list[Alert]:
+        unused = [
+            material for index, material in enumerate(props.materials)
+            if index not in props.slot_section_usage
+        ]
+        if not unused:
+            return []
+        return [Alert(
+            id="unused_material_slots",
+            severity=Severity.WARNING,
+            message=f"Unused materials slots: {len(unused)}!",
+            current_value=str(len(unused)),
+            is_fixable=True,
+        )]
+
+    def fix(self, asset, alert, props=None, options=None):
+        if isinstance(asset, unreal.StaticMesh):
+            materials = asset.get_editor_property("static_materials")
+            used_indices = set(props.slot_section_usage.keys())
+            new_materials = [material for index, material in enumerate(materials) if index in used_indices]
+            asset.set_editor_property("static_materials", new_materials)
+        else:
+            materials = asset.get_editor_property("materials")
+            used_indices = set(props.slot_section_usage.keys())
+            new_materials = [material for index, material in enumerate(materials) if index in used_indices]
+            asset.set_editor_property("materials", new_materials)
+        unreal.log(f"Removed {len(materials) - len(new_materials)} unused material slots from {asset.get_fname()}")
+        return True
+
 MESH_CHECKS = [
     MikkTSpaceCheck(),
     NoTangentSourceCheck(),
@@ -150,4 +183,5 @@ MESH_CHECKS = [
     RecomputeTangentsCheck(),
     RemoveDegeneratesCheck(),
     TriangleCountCheck(),
+    UnusedMaterialSlotsCheck(),
 ]
