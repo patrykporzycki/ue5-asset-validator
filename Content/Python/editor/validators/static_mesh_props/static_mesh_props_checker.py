@@ -62,6 +62,16 @@ class NaniteCheck(Check):
                 current_value=props.triangles,
             ))
 
+        if props.nanite and props.material_slot_blend_modes:
+            for idx, mode in props.material_slot_blend_modes.items():
+                if mode == "BLEND_Translucent":
+                    alerts.append(Alert(
+                        id="nanite_translucent",
+                        severity=Severity.ERROR,
+                        message=f"Nanite enabled but material slot [{idx}] uses translucent material. Nanite does not support translucent rendering!",
+                        current_value=mode,
+                    ))
+
         return alerts
 
     def fix(self, asset, alert, props=None, options=None):

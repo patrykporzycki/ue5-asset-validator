@@ -23,6 +23,14 @@ def _get_build_settings(asset, build_property):
 def _has_degenerates_triangles(asset):
     return unreal.MeshPropsHelper.static_mesh_has_degenerate_triangles(asset)
 
+def _get_material_slot_blend_modes(asset):
+    modes = {}
+    for i, static_mat in enumerate(asset.static_materials):
+        material_interface = static_mat.material_interface
+        if material_interface:
+            modes[i] = str(material_interface.get_blend_mode())
+    return modes
+
 @dataclass
 class StaticMeshProps(BaseProps):
     triangles: int = 0
@@ -37,6 +45,7 @@ class StaticMeshProps(BaseProps):
     generate_lightmap_u_vs: bool | None = None
     remove_degenerates: bool | None = None
     has_degenerates_triangles: bool | None = None
+    material_slot_blend_modes: dict[int, str] | None = None
 
 class StaticMeshPropsAdapter(AssetAdapter):
     requires_u_object = True
@@ -58,4 +67,5 @@ class StaticMeshPropsAdapter(AssetAdapter):
             props.generate_lightmap_u_vs = _get_build_settings(asset, "generate_lightmap_u_vs")
             props.remove_degenerates = _get_build_settings(asset, "remove_degenerates")
             props.has_degenerates_triangles = _has_degenerates_triangles(asset)
+            props.material_slot_blend_modes = _get_material_slot_blend_modes(asset)
         return props
