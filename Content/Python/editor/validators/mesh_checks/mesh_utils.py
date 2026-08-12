@@ -37,7 +37,11 @@ def get_materials_properties(asset):
 
     slot_section_usage = {}
     for lod in range(subsys.get_lod_count(asset)):
-        for section in range(subsys.get_num_sections(asset, lod)):
+        if isinstance(asset, unreal.StaticMesh):
+            num_sections = asset.get_num_sections(lod)
+        else:
+            num_sections = subsys.get_num_sections(asset, lod)
+        for section in range(num_sections):
             slot_index = subsys.get_lod_material_slot(asset, lod, section)
             if slot_index >= 0:
                 if slot_index not in slot_section_usage:

@@ -16,6 +16,10 @@ def _get_material_slot_blend_modes(asset):
             modes[i] = str(material_interface.get_blend_mode())
     return modes
 
+def _get_nanite_enabled(asset):
+    subsystem = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
+    return subsystem.get_nanite_settings(asset).enabled
+
 @dataclass
 class StaticMeshProps(BaseProps):
     triangles: int = 0
@@ -45,9 +49,9 @@ class StaticMeshPropsAdapter(AssetAdapter):
             material_count=int(self.get_tag(asset_data, "Materials") or 0),
             lods=int(self.get_tag(asset_data, "LODs") or 0),
             collisions=int(self.get_tag(asset_data, "CollisionPrims") or 0),
-            nanite=bool(self.get_tag(asset_data, "NaniteEnabled") or 0),
         )
         if asset:
+            props.nanite = _get_nanite_enabled(asset)
             props.recompute_normals = get_build_setting(asset, "recompute_normals")
             props.recompute_tangents = get_build_setting(asset, "recompute_tangents")
             props.mikk_t_space = get_mikk_t_space(asset)

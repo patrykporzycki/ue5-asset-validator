@@ -54,7 +54,7 @@
         "params": {}
       },
       "nanite": {
-        "enabled": false,
+        "enabled": true,
         "exclude_folders": [],
         "params": {
           "expected_value": true,
