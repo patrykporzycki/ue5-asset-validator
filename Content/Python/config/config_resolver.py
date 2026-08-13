@@ -22,4 +22,8 @@ def resolve_config(check_id: str, asset_path: str, rules: dict, on_import: bool 
     if on_import and not config.get("run_on_import", True):
         return None
 
+    for folder in config.get("exclude_folders", []):
+        if folder in asset_path:
+            return None
+
     return config

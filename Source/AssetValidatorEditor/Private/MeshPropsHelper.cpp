@@ -53,3 +53,19 @@ bool UMeshPropsHelper::SkeletalMeshHasDegenerateTriangles(USkeletalMesh* Mesh)
     }
     return false;
 }
+
+bool UMeshPropsHelper::StaticMeshHasLightmapUVs(UStaticMesh* Mesh)
+{
+    if (!Mesh)
+        return false;
+
+    const int32 LightmapUVIndex = Mesh->GetLightMapCoordinateIndex();
+    if (LightmapUVIndex <= 0)
+        return false;
+
+    const FMeshDescription* MeshDescription = Mesh->GetMeshDescription(0);
+    if (!MeshDescription)
+        return false;
+
+    return MeshDescription->GetNumUVElementChannels() > LightmapUVIndex;
+}

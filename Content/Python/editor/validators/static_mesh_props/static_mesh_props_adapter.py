@@ -8,6 +8,9 @@ from editor.validators.mesh_checks.mesh_utils import get_build_setting, get_mikk
 def _has_degenerates_triangles(asset):
     return unreal.MeshPropsHelper.static_mesh_has_degenerate_triangles(asset)
 
+def _has_lightmap_u_vs(asset):
+    return unreal.MeshPropsHelper.static_mesh_has_lightmap_u_vs(asset)
+
 def _get_material_slot_blend_modes(asset):
     modes = {}
     for i, static_mat in enumerate(asset.static_materials):
@@ -34,6 +37,7 @@ class StaticMeshProps(BaseProps):
     generate_lightmap_u_vs: bool | None = None
     remove_degenerates: bool | None = None
     has_degenerates_triangles: bool | None = None
+    has_lightmap_u_vs: bool | None = None
     material_slot_blend_modes: dict[int, str] | None = None
     materials: list | None = None
     slot_section_usage: dict[int, set[int]] | None = None
@@ -58,6 +62,7 @@ class StaticMeshPropsAdapter(AssetAdapter):
             props.generate_lightmap_u_vs = get_build_setting(asset, "generate_lightmap_u_vs")
             props.remove_degenerates = get_build_setting(asset, "remove_degenerates")
             props.has_degenerates_triangles = _has_degenerates_triangles(asset)
+            props.has_lightmap_u_vs = _has_lightmap_u_vs(asset)
             props.material_slot_blend_modes = _get_material_slot_blend_modes(asset)
             props.materials, props.slot_section_usage = get_materials_properties(asset)
         return props

@@ -90,11 +90,16 @@ class GenerateLightmapUVCheck(Check):
     requires_deep = True
 
     def check(self, props, config) -> list[Alert]:
-        if props.generate_lightmap_u_vs is False:
+        params = config.get("params", {})
+
+        if not params.get("expected_value", False):
+            return []
+
+        if props.generate_lightmap_u_vs is False and props.has_lightmap_u_vs is False:
             return [Alert(
                 id="generate_lightmap_u_vs",
-                severity=Severity.WARNING,
-                message="Generate Lightmap UVs is OFF, no lightmap UV channel for static lighting!",
+                severity=Severity.ERROR,
+                message="Mesh requires lightmaps but has no lightmap UV channel!",
                 current_value=False,
                 correct_value=True,
                 is_fixable=True,

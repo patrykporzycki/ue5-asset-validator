@@ -74,7 +74,9 @@
         "enabled": false,
         "run_on_import": false,
         "exclude_folders": [],
-        "params": {}
+        "params": {
+          "expected_value": true
+        }
       },
       "triangle_count": {
         "enabled": true,

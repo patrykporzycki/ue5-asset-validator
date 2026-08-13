@@ -16,6 +16,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Asset Validator|Mesh Props")
 	static bool SkeletalMeshHasDegenerateTriangles(USkeletalMesh* Mesh);
 
+	UFUNCTION(BlueprintCallable, Category = "Asset Validator|Mesh Props")
+	static bool StaticMeshHasLightmapUVs(UStaticMesh* Mesh);
+
 private:
 	static bool CheckDegenerateTriangles(FMeshDescription* MeshDescription);
 };

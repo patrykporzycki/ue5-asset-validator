@@ -14,6 +14,7 @@ import_hook_state = {
     "validation_rules": None,
     "is_active": False,
 }
+
 def _get_validation_rules():
     if import_hook_state["validation_rules"] is None:
         rules_path = pathlib.Path(__file__).parent.parent / "config" / "validation_rules.json"
@@ -49,7 +50,6 @@ def _process_pending_imports(delta_time):
         _validate_imported_asset(queued_import["asset_data"], queued_import["created_object"])
         validated_assets_this_tick += 1
 
-
 def _validate_imported_asset(asset_data, created_object):
     try:
         validation_rules = _get_validation_rules()
@@ -83,7 +83,6 @@ def start_import_hook():
     import_hook_state["slate_tick_handle"] = unreal.register_slate_post_tick_callback(_process_pending_imports)
     import_hook_state["is_active"] = True
     unreal.log("[AssetValidator] import hook active")
-
 
 def stop_import_hook():
     if not import_hook_state["is_active"]:
