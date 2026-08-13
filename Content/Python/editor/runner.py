@@ -3,6 +3,7 @@ import os
 from core.types import Report, FixResult
 from editor.registry import VALIDATOR_REGISTRY
 from core.validator import validate
+from config.config_resolver import resolve_config
 
 _PACKAGE_BUDGET = 100
 
@@ -23,6 +24,53 @@ def _file_timestamp(path):
     except (FileNotFoundError, OSError):
         return None
 
+def _has_import_active_checks(validator, asset_path, rules):
+    for check in validator.checks:
+        if resolve_config(check.check_id, asset_path, rules, on_import=True) is not None:
+            return True
+    return False
+
+def _audit_asset(asset_data, rules, active_validators, asset=None, on_import=False):
+    path = str(asset_data.package_name)
+    asset_class = str(asset_data.asset_class_path.asset_name)
+
+    if asset is None:
+        needs_u_object = False
+        for active_validator in active_validators.values():
+            if asset_class in active_validator.applies_to or "*" in active_validator.applies_to:
+                if active_validator.adapter.requires_u_object:
+                    needs_u_object = True
+                    break
+        if needs_u_object:
+            asset = unreal.find_asset(path) or unreal.EditorAssetLibrary.load_asset(path)
+
+    all_alerts = {}
+    all_props = {}
+    for validator_name, validator in active_validators.items():
+        if asset_class not in validator.applies_to and "*" not in validator.applies_to:
+            continue
+        if on_import and not _has_import_active_checks(validator, path, rules):
+            continue
+        try:
+            properties = validator.adapter.get_properties(asset_data, asset)
+            alerts = validate(properties, rules, validator.checks, on_import)
+            if alerts:
+                all_alerts[validator_name] = alerts
+                all_props[validator_name] = properties
+        except Exception as e:
+            unreal.log_warning(f"Validator {validator_name} failed to audit asset {asset_data.asset_class_path.asset_name} : {e}")
+            continue
+
+    if all_alerts:
+        return Report(path, str(asset_data.asset_name), asset_class, all_alerts, all_props, _file_timestamp(path))
+    return None
+
+
+def validate_asset(asset_data, rules, validators = None, asset=None, on_import=False):
+    active_validators = _select_active_validators(validators)
+    return _audit_asset(asset_data, rules, active_validators, asset=asset, on_import=on_import)
+
+
 def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
     reports = []
     active_validators = _select_active_validators(validators)
@@ -33,44 +81,15 @@ def audit(asset_datas: unreal.AssetData, rules: dict, validators=None):
         for asset_data in asset_datas:
             path = str(asset_data.package_name)
             try:
-                asset_class = str(asset_data.asset_class_path.asset_name)
-                needs_u_object = False
-                for active_validator in active_validators.values():
-                    if asset_class in active_validator.applies_to or "*" in active_validator.applies_to:
-                        if active_validator.adapter.requires_u_object:
-                            needs_u_object = True
-                            break
-
-                asset = None
                 slow_task.enter_progress_frame(1, f"Loading: {path}")
-                if needs_u_object:
-                    asset = unreal.find_asset(path) or unreal.EditorAssetLibrary.load_asset(str(path))
-
-                all_alerts = {}
-                all_props = {}
-                for validator_name, validator in active_validators.items():
-                    if asset_class not in validator.applies_to and "*" not in validator.applies_to:
-                        continue
-                    try:
-                        asset_for_adapter = asset if validator.adapter.requires_u_object else None
-                        properties = validator.adapter.get_properties(asset_data, asset_for_adapter)
-                        alerts = validate(properties, rules, validator.checks)
-                        if alerts:
-                            all_alerts[validator_name] = alerts
-                            all_props[validator_name] = properties
-                    except Exception as e:
-                        unreal.log_warning(f"Validator {validator_name} failed to audit asset {asset_data.asset_class_path.asset_name} : {e}")
-                        continue
-                if all_alerts:
-                    report = Report(path, str(asset_data.asset_name), asset_class, all_alerts, all_props, _file_timestamp(path))
+                report = _audit_asset(asset_data, rules, active_validators)
+                if report is not None:
                     reports.append(report)
 
-                if needs_u_object:
-                    current_packages = unreal.PackageLoaderManager.get_loaded_package_count()
-                    if current_packages - len(base_packages) > _PACKAGE_BUDGET:
-                        asset = None
-                        unreal.PackageLoaderManager.unload_loaded_packages(base_packages)
-                        unreal.SystemLibrary.collect_garbage()
+                current_packages = unreal.PackageLoaderManager.get_loaded_package_count()
+                if current_packages - len(base_packages) > _PACKAGE_BUDGET:
+                    unreal.PackageLoaderManager.unload_loaded_packages(base_packages)
+                    unreal.SystemLibrary.collect_garbage()
 
             except Exception as e:
                 unreal.log_warning(f"Failed to audit asset {asset_data.asset_class_path.asset_name}", e)

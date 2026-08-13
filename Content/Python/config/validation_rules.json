@@ -4,11 +4,13 @@
     "checks": {
       "lods": {
         "enabled": true,
+        "run_on_import": false,
         "exclude_folders": [],
         "params": {}
       },
       "collisions": {
         "enabled": true,
+        "run_on_import": false,
         "exclude_folders": [],
         "params": {}
       },
@@ -21,6 +23,7 @@
       },
       "cloth_physics": {
         "enabled": false,
+        "run_on_import": false,
         "exclude_folders": [],
         "params": {}
       },
@@ -55,6 +58,7 @@
       },
       "nanite": {
         "enabled": true,
+        "run_on_import": false,
         "exclude_folders": [],
         "params": {
           "expected_value": true,
@@ -68,6 +72,7 @@
       },
       "generate_lightmap_u_vs": {
         "enabled": false,
+        "run_on_import": false,
         "exclude_folders": [],
         "params": {}
       },
@@ -206,11 +211,13 @@
       },
       "broken_references": {
         "enabled": true,
+        "run_on_import": false,
         "exclude_folders": [],
         "params": {}
       },
       "unused_asset": {
         "enabled": true,
+        "run_on_import": false,
         "exclude_folders": [],
         "params": {}
       },

@@ -1,4 +1,4 @@
-def resolve_config(check_id: str, asset_path: str, rules: dict) -> dict | None:
+def resolve_config(check_id: str, asset_path: str, rules: dict, on_import: bool = False) -> dict | None:
 
     defaults = rules.get("defaults", {}).get("checks", {}).get(check_id)
     if defaults is None:
@@ -17,6 +17,9 @@ def resolve_config(check_id: str, asset_path: str, rules: dict) -> dict | None:
                 break
 
     if not config.get("enabled", False):
+        return None
+
+    if on_import and not config.get("run_on_import", True):
         return None
 
     return config
