@@ -69,3 +69,15 @@ bool UMeshPropsHelper::StaticMeshHasLightmapUVs(UStaticMesh* Mesh)
 
     return MeshDescription->GetNumUVElementChannels() > LightmapUVIndex;
 }
+
+int32 UMeshPropsHelper::StaticMeshGetUVChannelCount(UStaticMesh* Mesh)
+{
+    if (!Mesh)
+        return 0;
+
+    const FMeshDescription* MeshDescription = Mesh->GetMeshDescription(0);
+    if (!MeshDescription)
+        return 0;
+
+    return MeshDescription->GetNumUVElementChannels();
+}

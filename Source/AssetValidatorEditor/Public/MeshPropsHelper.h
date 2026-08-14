@@ -19,6 +19,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Asset Validator|Mesh Props")
 	static bool StaticMeshHasLightmapUVs(UStaticMesh* Mesh);
 
+	UFUNCTION(BlueprintCallable, Category = "Asset Validator|Mesh Props")
+	static int32 StaticMeshGetUVChannelCount(UStaticMesh* Mesh);
+
 private:
 	static bool CheckDegenerateTriangles(FMeshDescription* MeshDescription);
 };
