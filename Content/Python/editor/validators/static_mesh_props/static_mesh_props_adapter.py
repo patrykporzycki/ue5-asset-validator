@@ -26,6 +26,12 @@ def _get_nanite_settings(asset):
     subsystem = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
     return subsystem.get_nanite_settings(asset)
 
+def _get_collision_trace_flag(asset):
+    body_setup = asset.get_editor_property("body_setup")
+    if body_setup is None:
+        return None
+    return str(body_setup.get_editor_property("collision_trace_flag"))
+
 @dataclass
 class StaticMeshProps(BaseProps):
     triangles: int = 0
@@ -34,7 +40,6 @@ class StaticMeshProps(BaseProps):
     collisions: int = 0
     nanite: bool = False
 
-    nanite_fallback_percent_triangles: float | None = None
     recompute_normals: bool | None = None
     recompute_tangents: bool | None = None
     mikk_t_space: bool | None = None
@@ -46,6 +51,8 @@ class StaticMeshProps(BaseProps):
     material_slot_blend_modes: dict[int, str] | None = None
     materials: list | None = None
     slot_section_usage: dict[int, set[int]] | None = None
+    collision_trace_flag: str | None = None
+    nanite_fallback_percent_triangles: float | None = None
 
 class StaticMeshPropsAdapter(AssetAdapter):
     requires_u_object = True
@@ -66,6 +73,7 @@ class StaticMeshPropsAdapter(AssetAdapter):
             props.recompute_normals = get_build_setting(asset, "recompute_normals")
             props.recompute_tangents = get_build_setting(asset, "recompute_tangents")
             props.mikk_t_space = get_mikk_t_space(asset)
+            props.collision_trace_flag = _get_collision_trace_flag(asset)
             props.generate_lightmap_u_vs = get_build_setting(asset, "generate_lightmap_u_vs")
             props.remove_degenerates = get_build_setting(asset, "remove_degenerates")
             props.has_degenerates_triangles = _has_degenerates_triangles(asset)

@@ -15,7 +15,9 @@
         "enabled": true,
         "run_on_import": false,
         "exclude_folders": [],
-        "params": {}
+        "params": {
+          "min_triangles": 100
+        }
       },
       "bone_influences": {
         "enabled": true,

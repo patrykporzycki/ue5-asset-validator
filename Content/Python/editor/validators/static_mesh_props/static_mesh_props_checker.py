@@ -12,15 +12,28 @@ class CollisionsCheck(Check):
     check_id = "collisions"
 
     def check(self, props, config) -> list[Alert]:
+        alerts = []
         if props.collisions == 0:
-            return [Alert(
+            alerts.append(Alert(
                 id="collisions",
                 severity=Severity.WARNING,
                 message="Collisions are not set!",
                 current_value=str(props.collisions),
                 correct_value=None
-            )]
-        return []
+            ))
+        min_triangles = config.get("params", {}).get("min_triangles", 100)
+        if (props.collision_trace_flag
+                and "CTF_USE_COMPLEX_AS_SIMPLE" in props.collision_trace_flag
+                and props.triangles > min_triangles):
+            alerts.append(Alert(
+                id="collision_complex_as_simple",
+                severity=Severity.WARNING,
+                message=f"Collision uses ComplexAsSimple on a {props.triangles} triangles mesh!",
+                current_value=props.collision_trace_flag,
+                correct_value="CTF_USE_SIMPLE_AS_COMPLEX",
+                is_fixable=False,
+            ))
+        return alerts
 
 class NaniteCheck(Check):
     check_id = "nanite"
