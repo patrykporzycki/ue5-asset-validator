@@ -46,7 +46,7 @@ void UPackageLoaderManager::UnloadLoadedPackages(const TArray<FString>& KeepLoad
 		UPackage* Package = *It;
 		if (!Package->HasAnyPackageFlags(PKG_InMemoryOnly) && Package->HasAnyFlags(RF_WasLoaded))
 		{
-			if (!Keep.Contains(Package->GetName()))
+			if (!Keep.Contains(Package->GetName()) && !Package->IsDirty())
 			{
 				ToUnload.Add(Package);
 			}
