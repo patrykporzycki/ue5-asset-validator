@@ -6,7 +6,10 @@
         "enabled": true,
         "run_on_import": false,
         "exclude_folders": [],
-        "params": {}
+        "params": {
+          "min_lods": 2,
+          "num_lods": 3
+        }
       },
       "collisions": {
         "enabled": true,
@@ -241,6 +244,14 @@
           }
         }
       }
+    },
+    {
+      "name": "optimized_lods",
+      "reduction_settings": [
+        {"percent_triangles": 1.0, "screen_size": 1.0},
+        {"percent_triangles": 0.35, "screen_size": 0.5},
+        {"percent_triangles": 0.15, "screen_size": 0.25}
+      ]
     }
   ]
 }

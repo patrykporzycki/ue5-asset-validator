@@ -1,6 +1,7 @@
 from __future__ import annotations
 from core.types import Check
-from core.types import Alert, Severity
+from core.types import Alert, Severity, FixOption
+from editor.validators.skeletal_mesh_props.skeletal_mesh_props_adapter import SkeletalMeshProps
 
 try:
     import unreal
@@ -95,7 +96,7 @@ class RecomputeTangentsCheck(Check):
             return [Alert(
                 id="recompute_tangents",
                 severity=Severity.WARNING,
-                message="Recompute Tangents is ON." if props.recompute_tangents else "Recompute Tangents is OFF.",
+                message="Recompute Tangents is OFF but mesh has morph targets, it must be ON!" if props.has_morph_targets else "Recompute Tangents is ON." if props.recompute_tangents else "Recompute Tangents is OFF.",
                 current_value=str(props.recompute_tangents),
                 correct_value=expected,
                 is_fixable=True,
@@ -176,6 +177,149 @@ class UnusedMaterialSlotsCheck(Check):
         unreal.log(f"Removed {len(materials) - len(new_materials)} unused material slots from {asset.get_fname()}")
         return True
 
+def _is_skeletal_mesh(props, asset=None):
+    if props is not None:
+        return isinstance(props, SkeletalMeshProps)
+    return isinstance(asset, unreal.SkeletalMesh)
+
+
+def _default_lod_reduction(lod):
+    return {
+        "percent_triangles": 1.0 if lod == 0 else 0.5 ** lod,
+        "screen_size": 1.0 if lod == 0 else 0.5 ** lod,
+    }
+
+
+def _reduction_settings_presets(rules):
+    presets = []
+    for preset in rules.get("presets", []):
+        if preset.get("reduction_settings"):
+            presets.append(preset)
+    return presets
+
+
+def _collect_lod_reduction_settings(options, num_lods):
+    settings = []
+    for lod in range(num_lods):
+        percent_triangles = options.get(f"lod_{lod}_percent_triangles")
+        screen_size = options.get(f"lod_{lod}_screen_size")
+        if percent_triangles is None and screen_size is None:
+            settings.append({})
+        else:
+            settings.append({
+                "percent_triangles": float(percent_triangles),
+                "screen_size": float(screen_size),
+            })
+    return settings
+
+
+def _static_mesh_reduction_options(num_lods, auto_compute_lod_screen_size, reduction_settings):
+    options = unreal.StaticMeshReductionOptions()
+    options.auto_compute_lod_screen_size = auto_compute_lod_screen_size
+    settings = []
+    for lod in range(num_lods):
+        reduction = unreal.StaticMeshReductionSettings()
+        default = _default_lod_reduction(lod)
+        lod_settings = reduction_settings[lod] if lod < len(reduction_settings) else {}
+        reduction.percent_triangles = lod_settings.get("percent_triangles", default["percent_triangles"])
+        reduction.screen_size = lod_settings.get("screen_size", default["screen_size"])
+        settings.append(reduction)
+    options.reduction_settings = settings
+    return options
+
+
+class LODsCheck(Check):
+    check_id = "lods"
+
+    def check(self, props, config) -> list[Alert]:
+        params = config.get("params", {})
+        min_lods = params.get("min_lods", 2)
+        if props.lods >= min_lods:
+            return []
+        return [Alert(
+            id="lods",
+            severity=Severity.WARNING,
+            message="LODs are not set!",
+            current_value=str(props.lods),
+            correct_value=params.get("num_lods", 3),
+            is_fixable=True,
+        )]
+
+    def fix(self, asset, alert, props=None, options=None):
+        options = options or {}
+        num_lods = int(options.get("num_lods", alert.correct_value))
+
+        if _is_skeletal_mesh(props, asset):
+            subsystem = unreal.get_editor_subsystem(unreal.SkeletalMeshEditorSubsystem)
+            subsystem.regenerate_lod(asset, num_lods, True, False)
+            if "lod_settings" in options:
+                asset.set_editor_property("lod_settings", options["lod_settings"])
+        else:
+            subsystem = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
+            if options.get("lod_group"):
+                subsystem.set_lod_group(asset, options["lod_group"])
+            auto_compute_lod_screen_size = options.get("auto_compute_lod_screen_size", True)
+            reduction_settings = _collect_lod_reduction_settings(options, num_lods)
+            reduction_options = _static_mesh_reduction_options(num_lods, auto_compute_lod_screen_size, reduction_settings)
+            subsystem.set_lods(asset, reduction_options)
+
+        unreal.log(f"Set LODs to {num_lods} for {asset.get_fname()}")
+        return True
+
+    def get_fix_options(self, alert, props, rules):
+        num_lods = int(alert.correct_value)
+        presets = _reduction_settings_presets(rules)
+        active_preset = presets[0] if presets else None
+        active_reduction_settings = active_preset.get("reduction_settings", []) if active_preset else []
+
+        options = [FixOption(
+            key="num_lods",
+            label="Number of LODs",
+            default=num_lods,
+            choices=tuple(range(1, 9)),
+        )]
+        if _is_skeletal_mesh(props):
+            options.append(FixOption(
+                key="lod_settings",
+                label="LOD Settings",
+                default=None,
+            ))
+            return options
+
+        options.append(FixOption(
+            key="lod_group",
+            label="LOD Group",
+            default="",
+        ))
+        options.append(FixOption(
+            key="auto_compute_lod_screen_size",
+            label="Auto Compute LOD Screen Size",
+            default=True,
+            choices=(True, False),
+        ))
+        if presets:
+            options.append(FixOption(
+                key="reduction_settings_preset",
+                label="Reduction Settings Preset",
+                default=active_preset["name"],
+                choices=tuple(preset["name"] for preset in presets),
+            ))
+        for lod in range(num_lods):
+            preset_lod = active_reduction_settings[lod] if lod < len(active_reduction_settings) else {}
+            default = _default_lod_reduction(lod)
+            options.append(FixOption(
+                key=f"lod_{lod}_percent_triangles",
+                label=f"LOD {lod} Percent Triangles",
+                default=float(preset_lod.get("percent_triangles", default["percent_triangles"])),
+            ))
+            options.append(FixOption(
+                key=f"lod_{lod}_screen_size",
+                label=f"LOD {lod} Screen Size",
+                default=float(preset_lod.get("screen_size", default["screen_size"])),
+            ))
+        return options
+
+
 MESH_CHECKS = [
     MikkTSpaceCheck(),
     NoTangentSourceCheck(),
@@ -184,4 +328,5 @@ MESH_CHECKS = [
     RemoveDegeneratesCheck(),
     TriangleCountCheck(),
     UnusedMaterialSlotsCheck(),
+    LODsCheck(),
 ]

@@ -9,19 +9,6 @@ try:
 except ImportError:
     unreal = None
 
-class LODsCheck(Check):
-    check_id = "lods"
-
-    def check(self, props, config) -> list[Alert]:
-        if props.lods == 1:
-            return [Alert(
-                id="lods",
-                severity=Severity.WARNING,
-                message="LODs are not set!",
-                current_value=str(props.lods),
-            )]
-        return []
-
 class BoneInfluencesCheck(Check):
     check_id = "bone_influences"
 
@@ -177,7 +164,6 @@ class BoneValidationCheck(Check):
 
 SKELETAL_MESH_PROPS_CHECKS = [
     *MESH_CHECKS,
-    LODsCheck(),
     BoneInfluencesCheck(),
     ClothPhysicsCheck(),
     BoneValidationCheck(),
