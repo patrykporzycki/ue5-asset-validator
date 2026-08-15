@@ -26,6 +26,11 @@ class NaniteCheck(Check):
     check_id = "nanite"
     requires_deep = True
 
+    def is_applicable(self) -> bool:
+        if unreal is None:
+            return True
+        return unreal.SystemLibrary.get_console_variable_bool_value("r.Nanite.ProjectEnabled")
+
     def check(self, props, config) -> list[Alert]:
         alerts = []
         expected = config.get("params", {}).get("expected_value", True)
@@ -49,6 +54,20 @@ class NaniteCheck(Check):
                 current_value=props.triangles,
             ))
 
+        fallback_min_tris = config.get("params", {}).get("fallback_min_triangles", 10000)
+        fallback_max_percent = config.get("params", {}).get("fallback_max_percent", 0.5)
+        if (props.nanite
+                and props.triangles >= fallback_min_tris
+                and props.nanite_fallback_percent_triangles is not None
+                and props.nanite_fallback_percent_triangles > fallback_max_percent):
+            alerts.append(Alert(
+                id="nanite_fallback_unreduced",
+                severity=Severity.WARNING,
+                message=f"Nanite fallback keeps {props.nanite_fallback_percent_triangles:}% of triangles on a {props.triangles} triangles mesh!",
+                current_value=props.nanite_fallback_percent_triangles,
+                is_fixable=True,
+            ))
+
         if props.nanite and props.material_slot_blend_modes:
             for idx, mode in props.material_slot_blend_modes.items():
                 if mode == "BLEND_Translucent":
@@ -66,10 +85,27 @@ class NaniteCheck(Check):
             return False
         subsystem = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
         nanite_settings = subsystem.get_nanite_settings(asset)
-        nanite_settings.enabled = alert.correct_value
+        if alert.id == "nanite_fallback_unreduced":
+            fallback_percent_triangles = options.get("fallback_percent_triangles", 0.5) if options else 0.5
+            nanite_settings.fallback_target = unreal.NaniteFallbackTarget.PERCENT_TRIANGLES
+            nanite_settings.fallback_percent_triangles = float(fallback_percent_triangles)
+            unreal.log(f"Set nanite fallback percent to {nanite_settings.fallback_percent_triangles} for {asset.get_fname()}")
+        else:
+            nanite_settings.enabled = alert.correct_value
+            unreal.log(f"Set nanite to {alert.correct_value} for {asset.get_fname()}")
         subsystem.set_nanite_settings(asset, nanite_settings)
-        unreal.log(f"Set nanite to {alert.correct_value} for {asset.get_fname()}")
         return True
+
+    def get_fix_options(self, alert, props, rules):
+        if alert.id != "nanite_fallback_unreduced":
+            return []
+        return [
+            FixOption(
+                key="fallback_percent_triangles",
+                label="Fallback Percent Triangles",
+                default=0.5,
+            ),
+        ]
 
 
 class GenerateLightmapUVCheck(Check):

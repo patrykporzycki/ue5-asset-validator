@@ -65,7 +65,9 @@
         "exclude_folders": [],
         "params": {
           "expected_value": true,
-          "min_triangles": 5000
+          "min_triangles": 1000,
+          "fallback_min_triangles": 10000,
+          "fallback_max_percent": 0.5
         }
       },
       "morph_targets_tangents": {

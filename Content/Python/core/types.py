@@ -53,6 +53,9 @@ class Check:
     requires_deep: bool = False
     fix_options: list[FixOption] = []
 
+    def is_applicable(self) -> bool:
+        return True
+
     def check(self, properties, rules) -> list[Alert]:
         raise NotImplementedError
 

@@ -72,7 +72,7 @@ class RecomputeNormalsCheck(Check):
             return [Alert(
                 id="recompute_normals",
                 severity=Severity.WARNING,
-                message="Recompute Normals is ON, discarding source normals." if props.recompute_normals else "Recompute Normals is OFF.",
+                message="Recompute Normals is ON, discarding source normals!" if props.recompute_normals else "Recompute Normals is OFF.",
                 current_value=str(props.recompute_normals),
                 correct_value=expected,
                 is_fixable=True,

@@ -26,7 +26,7 @@ def _file_timestamp(path):
 
 def _has_import_active_checks(validator, asset_path, rules):
     for check in validator.checks:
-        if resolve_config(check.check_id, asset_path, rules, on_import=True) is not None:
+        if check.is_applicable() and resolve_config(check.check_id, asset_path, rules, on_import=True) is not None:
             return True
     return False
 
