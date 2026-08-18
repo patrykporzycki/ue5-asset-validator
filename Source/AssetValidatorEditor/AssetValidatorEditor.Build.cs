@@ -15,6 +15,7 @@ public class AssetValidatorEditor : ModuleRules
             "MeshDescription",
             "StaticMeshDescription",
             "SkeletalMeshDescription",
+            "Niagara",
         });
     }
 

@@ -234,6 +234,11 @@
         "enabled": true,
         "exclude_folders": [],
         "params": {}
+      },
+      "gpu_dynamic_bounds": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
       }
     }
   },
