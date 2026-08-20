@@ -244,6 +244,11 @@
         "enabled": true,
         "exclude_folders": [],
         "params": {}
+      },
+      "determinism_mismatch": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
       }
     }
   },

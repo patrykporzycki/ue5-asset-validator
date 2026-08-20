@@ -11,6 +11,7 @@ class EmitterBoundsInfo:
     b_local_space: bool = False
     bounds_mode: int = 0
     emitter_fixed_bounds_size: float = 0.0
+    b_determinism: bool = False
 
 
 @dataclass
@@ -19,6 +20,7 @@ class NiagaraProps(BaseProps):
     active_emitters: int = 0
     emitter_bounds: list = field(default_factory=list)
     effect_type: str = ""
+    b_system_determinism: bool = False
 
 
 class NiagaraAdapter(AssetAdapter):
@@ -34,7 +36,9 @@ class NiagaraAdapter(AssetAdapter):
         if asset:
             try:
                 emitters_data = unreal.NiagaraPropsHelper.get_niagara_emitters_data(asset)
-                props.effect_type = str(unreal.NiagaraPropsHelper.get_niagara_effect_type_name(asset))
+                effect_type_object = asset.get_editor_property("effect_type")
+                props.effect_type = effect_type_object.get_name() if effect_type_object else ""
+                props.b_system_determinism = bool(asset.get_editor_property("determinism"))
                 props.emitter_bounds = [
                     EmitterBoundsInfo(
                         emitter_name=str(e.emitter_name),
@@ -42,6 +46,7 @@ class NiagaraAdapter(AssetAdapter):
                         b_local_space=bool(e.local_space),
                         bounds_mode=int(e.bounds_mode),
                         emitter_fixed_bounds_size=float(e.emitter_fixed_bounds_size),
+                        b_determinism=bool(e.determinism),
                     )
                     for e in emitters_data
                 ]

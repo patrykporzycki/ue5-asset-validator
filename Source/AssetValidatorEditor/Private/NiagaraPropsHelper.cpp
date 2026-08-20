@@ -4,7 +4,6 @@
 #include "NiagaraEmitter.h"
 #include "NiagaraEmitterHandle.h"
 #include "NiagaraCommon.h"
-#include "NiagaraEffectType.h"
 
 TArray<FNiagaraEmitterBoundsInfo> UNiagaraPropsHelper::GetNiagaraEmittersData(UNiagaraSystem* System)
 {
@@ -31,6 +30,7 @@ TArray<FNiagaraEmitterBoundsInfo> UNiagaraPropsHelper::GetNiagaraEmittersData(UN
         Info.EmitterFixedBoundsSize = EmitterData->FixedBounds.IsValid != 0
             ? EmitterData->FixedBounds.GetSize().GetMax()
             : 0.0f;
+        Info.bDeterminism = EmitterData->bDeterminism;
 
         EmitterInfos.Add(Info);
     }
@@ -38,13 +38,4 @@ TArray<FNiagaraEmitterBoundsInfo> UNiagaraPropsHelper::GetNiagaraEmittersData(UN
     return EmitterInfos;
 }
 
-FString UNiagaraPropsHelper::GetNiagaraEffectTypeName(UNiagaraSystem* System)
-{
-    if (!System)
-    {
-        return FString();
-    }
-    const UNiagaraEffectType* EffectType = System->GetEffectType();
-    return EffectType ? EffectType->GetName() : FString();
-}
 
