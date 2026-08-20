@@ -18,6 +18,7 @@ class NiagaraProps(BaseProps):
     emitters: int = 0
     active_emitters: int = 0
     emitter_bounds: list = field(default_factory=list)
+    effect_type: str = ""
 
 
 class NiagaraAdapter(AssetAdapter):
@@ -33,6 +34,7 @@ class NiagaraAdapter(AssetAdapter):
         if asset:
             try:
                 emitters_data = unreal.NiagaraPropsHelper.get_niagara_emitters_data(asset)
+                props.effect_type = str(unreal.NiagaraPropsHelper.get_niagara_effect_type_name(asset))
                 props.emitter_bounds = [
                     EmitterBoundsInfo(
                         emitter_name=str(e.emitter_name),

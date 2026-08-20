@@ -33,4 +33,7 @@ class ASSETVALIDATOREDITOR_API UNiagaraPropsHelper : public UBlueprintFunctionLi
 public:
 	UFUNCTION(BlueprintCallable, Category = "Asset Validator|Niagara Props")
 	static TArray<FNiagaraEmitterBoundsInfo> GetNiagaraEmittersData(UNiagaraSystem* System);
+
+	UFUNCTION(BlueprintCallable, Category = "Asset Validator|Niagara Props")
+	static FString GetNiagaraEffectTypeName(UNiagaraSystem* System);
 };

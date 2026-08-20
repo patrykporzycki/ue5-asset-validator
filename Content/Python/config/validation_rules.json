@@ -239,6 +239,11 @@
         "enabled": true,
         "exclude_folders": [],
         "params": {}
+      },
+      "missing_effect_type": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {}
       }
     }
   },
