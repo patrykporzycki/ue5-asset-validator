@@ -241,11 +241,18 @@
         "params": {}
       },
       "missing_effect_type": {
-        "enabled": true,
+        "enabled": false,
         "exclude_folders": [],
         "params": {}
       },
-      "determinism_mismatch": {
+      "use_light_renderer": {
+        "enabled": true,
+        "exclude_folders": [],
+        "params": {
+          "max_light_renderers": 0
+        }
+      },
+      "invisible_emitter": {
         "enabled": true,
         "exclude_folders": [],
         "params": {}

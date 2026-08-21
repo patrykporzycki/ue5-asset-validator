@@ -26,6 +26,18 @@ struct FNiagaraEmitterBoundsInfo
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bDeterminism = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bEnabled = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bFixedBounds = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 NumEnabledRenderers = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 NumEnabledLightRenderers = 0;
 };
 
 UCLASS()

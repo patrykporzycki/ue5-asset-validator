@@ -12,6 +12,10 @@ class EmitterBoundsInfo:
     bounds_mode: int = 0
     emitter_fixed_bounds_size: float = 0.0
     b_determinism: bool = False
+    num_enabled_light_renderers: int = 0
+    b_enabled: bool = False
+    b_fixed_bounds: bool = False
+    num_enabled_renderers: int = 0
 
 
 @dataclass
@@ -21,6 +25,7 @@ class NiagaraProps(BaseProps):
     emitter_bounds: list = field(default_factory=list)
     effect_type: str = ""
     b_system_determinism: bool = False
+    b_fixed_bounds: bool = False
 
 
 class NiagaraAdapter(AssetAdapter):
@@ -39,6 +44,7 @@ class NiagaraAdapter(AssetAdapter):
                 effect_type_object = asset.get_editor_property("effect_type")
                 props.effect_type = effect_type_object.get_name() if effect_type_object else ""
                 props.b_system_determinism = bool(asset.get_editor_property("determinism"))
+                props.b_fixed_bounds = bool(emitters_data[0].fixed_bounds) if emitters_data else False
                 props.emitter_bounds = [
                     EmitterBoundsInfo(
                         emitter_name=str(e.emitter_name),
@@ -47,6 +53,10 @@ class NiagaraAdapter(AssetAdapter):
                         bounds_mode=int(e.bounds_mode),
                         emitter_fixed_bounds_size=float(e.emitter_fixed_bounds_size),
                         b_determinism=bool(e.determinism),
+                        num_enabled_light_renderers=int(e.num_enabled_light_renderers),
+                        b_enabled=bool(e.enabled),
+                        b_fixed_bounds=bool(e.fixed_bounds),
+                        num_enabled_renderers=int(e.num_enabled_renderers),
                     )
                     for e in emitters_data
                 ]

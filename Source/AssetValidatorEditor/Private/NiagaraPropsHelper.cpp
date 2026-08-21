@@ -4,6 +4,7 @@
 #include "NiagaraEmitter.h"
 #include "NiagaraEmitterHandle.h"
 #include "NiagaraCommon.h"
+#include "NiagaraLightRendererProperties.h"
 
 TArray<FNiagaraEmitterBoundsInfo> UNiagaraPropsHelper::GetNiagaraEmittersData(UNiagaraSystem* System)
 {
@@ -31,6 +32,20 @@ TArray<FNiagaraEmitterBoundsInfo> UNiagaraPropsHelper::GetNiagaraEmittersData(UN
             ? EmitterData->FixedBounds.GetSize().GetMax()
             : 0.0f;
         Info.bDeterminism = EmitterData->bDeterminism;
+        Info.bEnabled = Handle.GetIsEnabled();
+        Info.bFixedBounds = System->bFixedBounds;
+
+        for (const UNiagaraRendererProperties* Renderer : EmitterData->GetRenderers())
+        {
+            if (Renderer && Renderer->GetIsEnabled())
+            {
+                Info.NumEnabledRenderers++;
+                if (Renderer->IsA<UNiagaraLightRendererProperties>())
+                {
+                    Info.NumEnabledLightRenderers++;
+                }
+            }
+        }
 
         EmitterInfos.Add(Info);
     }
